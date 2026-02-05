@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 
@@ -7,13 +7,25 @@ const outfit = Outfit({
   variable: "--font-outfit",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#6366f1",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: "SomaNeza - Learn Kinyarwanda",
   description: "Interactive app to help toddlers learn reading Kinyarwanda letters and syllables",
   keywords: ["Kinyarwanda", "Rwanda", "learn reading", "toddlers", "education", "syllables"],
   authors: [{ name: "SomaNeza" }],
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
-  themeColor: "#6366f1",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SomaNeza",
+  },
 };
 
 export default function RootLayout({
