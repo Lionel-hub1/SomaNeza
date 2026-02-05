@@ -1,158 +1,209 @@
 @import "tailwindcss";
 
 :root {
-  --font-outfit: "Outfit", system-ui, sans-serif;
+	--font-outfit: "Outfit", system-ui, sans-serif;
 }
 
 * {
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 html {
-  scroll-behavior: smooth;
-  -webkit-tap-highlight-color: transparent;
+	scroll-behavior: smooth;
+	-webkit-tap-highlight-color: transparent;
 }
 
 body {
-  font-family: var(--font-outfit), system-ui, sans-serif;
-  min-height: 100vh;
-  min-height: 100dvh;
-  overscroll-behavior: none;
+	font-family: var(--font-outfit), system-ui, sans-serif;
+	min-height: 100vh;
+	min-height: 100dvh;
+	overscroll-behavior: none;
 }
 
 /* Custom Animations */
 @keyframes bounce-in {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+	0% {
+		transform: scale(0);
+		opacity: 0;
+	}
+	50% {
+		transform: scale(1.2);
+	}
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
 }
 
 @keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-10px);
+	}
 }
 
 @keyframes pulse-ring {
-  0% {
-    transform: scale(0.8);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
+	0% {
+		transform: scale(0.8);
+		opacity: 1;
+	}
+	100% {
+		transform: scale(1.5);
+		opacity: 0;
+	}
 }
 
 .animate-bounce-in {
-  animation: bounce-in 0.5s ease-out;
+	animation: bounce-in 0.5s ease-out;
 }
 
 .animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+	animation: fade-in 0.3s ease-out;
 }
 
 .animate-float {
-  animation: float 3s ease-in-out infinite;
+	animation: float 3s ease-in-out infinite;
+}
+
+/* Additional game animations */
+@keyframes shake {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-5px);
+	}
+	75% {
+		transform: translateX(5px);
+	}
+}
+
+@keyframes twinkle {
+	0%,
+	100% {
+		opacity: 0.3;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.2);
+	}
+}
+
+@keyframes train-move {
+	0% {
+		transform: translateX(0);
+	}
+	50% {
+		transform: translateX(10px);
+	}
+	100% {
+		transform: translateX(0);
+	}
+}
+
+.animate-shake {
+	animation: shake 0.4s ease-in-out;
+}
+
+.animate-twinkle {
+	animation: twinkle 2s ease-in-out infinite;
+}
+
+.animate-train-move {
+	animation: train-move 0.5s ease-in-out;
 }
 
 .animation-delay-200 {
-  animation-delay: 200ms;
+	animation-delay: 200ms;
 }
 
 .animation-delay-400 {
-  animation-delay: 400ms;
+	animation-delay: 400ms;
 }
 
 /* Touch optimization */
 button {
-  touch-action: manipulation;
-  -webkit-user-select: none;
-  user-select: none;
+	touch-action: manipulation;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 /* Prevent text selection on letter cards */
 .letter-card {
-  -webkit-user-select: none;
-  user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 /* Range slider customization */
 input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent;
-  cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	background: transparent;
+	cursor: pointer;
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
-  background: #e5e7eb;
-  height: 8px;
-  border-radius: 4px;
+	background: #e5e7eb;
+	height: 8px;
+	border-radius: 4px;
 }
 
 input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  margin-top: -4px;
-  background-color: #6366f1;
-  height: 16px;
-  width: 16px;
-  border-radius: 50%;
-  cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	margin-top: -4px;
+	background-color: #6366f1;
+	height: 16px;
+	width: 16px;
+	border-radius: 50%;
+	cursor: pointer;
 }
 
 input[type="range"]:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+	box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
 }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+	width: 6px;
+	height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
+	background: #f1f5f9;
+	border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+	background: #cbd5e1;
+	border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+	background: #94a3b8;
 }
 
 /* Safe area insets for modern devices */
 @supports (padding: max(0px)) {
-  body {
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  }
+	body {
+		padding-left: max(1rem, env(safe-area-inset-left));
+		padding-right: max(1rem, env(safe-area-inset-right));
+		padding-bottom: max(1rem, env(safe-area-inset-bottom));
+	}
 }
