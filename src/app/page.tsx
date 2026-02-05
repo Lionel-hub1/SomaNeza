@@ -1,65 +1,372 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import {
+  LearningMode,
+  PatternType,
+  GeneratedResult,
+  DEFAULT_SETTINGS,
+  DEFAULT_CONSONANT_CLUSTERS,
+  getPatternsForDifficulty,
+  DifficultyLevel,
+  GameType,
+  GameDifficulty,
+  GameState,
+} from '@/lib/kinyarwanda';
+import {
+  generate,
+  hideRandomLetters,
+  revealLetter,
+  toggleLetterHidden,
+  showAllLetters,
+  revealAllLetters
+} from '@/lib/generator';
+import LetterDisplay from '@/components/LetterDisplay';
+import GenerateButton from '@/components/GenerateButton';
+import ModeSelector from '@/components/ModeSelector';
+import PatternControls from '@/components/PatternControls';
+import SettingsPanel from '@/components/SettingsPanel';
+import {
+  GameSelector,
+  MatchingGame,
+  BubblePopGame,
+  MemoryGame,
+  GameComplete,
+} from '@/components/games';
+
+type AppView = 'learn' | 'games' | 'playing' | 'complete';
 
 export default function Home() {
+  // App view state
+  const [appView, setAppView] = useState<AppView>('learn');
+  const [selectedGame, setSelectedGame] = useState<GameType | null>(null);
+  const [gameDifficulty, setGameDifficulty] = useState<GameDifficulty>('easy');
+  const [completedGameState, setCompletedGameState] = useState<GameState | null>(null);
+
+  // Core state
+  const [result, setResult] = useState<GeneratedResult | null>(null);
+  const [learningMode, setLearningMode] = useState<LearningMode>('read');
+  const [isTeacherMode, setIsTeacherMode] = useState(false);
+
+  // Settings state
+  const [enabledPatterns, setEnabledPatterns] = useState<PatternType[]>(
+    DEFAULT_SETTINGS.enabledPatterns
+  );
+  const [lettersToHide, setLettersToHide] = useState(DEFAULT_SETTINGS.lettersToHide);
+  const [autoInterval, setAutoInterval] = useState<number | null>(
+    DEFAULT_SETTINGS.autoGenerateInterval
+  );
+  const [customClusters, setCustomClusters] = useState<string[]>(
+    [...DEFAULT_CONSONANT_CLUSTERS]
+  );
+
+  // Progressive mode state
+  const [progressiveLevel, setProgressiveLevel] = useState<DifficultyLevel>(1);
+  const [progressiveScore, setProgressiveScore] = useState(0);
+
+  // Generate new syllable
+  const handleGenerate = useCallback(() => {
+    let patterns = enabledPatterns;
+
+    // Use progressive patterns if in progressive mode
+    if (learningMode === 'progressive') {
+      patterns = getPatternsForDifficulty(progressiveLevel);
+    }
+
+    let newResult = generate(patterns, customClusters);
+
+    // Apply hiding based on mode
+    if (learningMode === 'guess') {
+      newResult = hideRandomLetters(newResult, lettersToHide);
+    }
+
+    setResult(newResult);
+  }, [enabledPatterns, learningMode, progressiveLevel, customClusters, lettersToHide]);
+
+  // Handle letter reveal (for guess mode)
+  const handleReveal = useCallback((index: number) => {
+    if (result) {
+      const newResult = revealLetter(result, index);
+      setResult(newResult);
+
+      // Check if all revealed in progressive mode
+      if (learningMode === 'progressive') {
+        const allRevealed = newResult.letterStates.every(
+          s => !s.isHidden || s.isRevealed
+        );
+        if (allRevealed) {
+          setProgressiveScore(prev => prev + 1);
+          // Level up every 5 correct
+          if ((progressiveScore + 1) % 5 === 0 && progressiveLevel < 3) {
+            setProgressiveLevel(prev => (prev + 1) as DifficultyLevel);
+          }
+        }
+      }
+    }
+  }, [result, learningMode, progressiveLevel, progressiveScore]);
+
+  // Handle teacher toggling letter visibility
+  const handleToggleHide = useCallback((index: number) => {
+    if (result && isTeacherMode) {
+      setResult(toggleLetterHidden(result, index));
+    }
+  }, [result, isTeacherMode]);
+
+  // Handle mode change
+  const handleModeChange = useCallback((mode: LearningMode) => {
+    setLearningMode(mode);
+
+    // Reset progressive state when entering progressive mode
+    if (mode === 'progressive') {
+      setProgressiveLevel(1);
+      setProgressiveScore(0);
+    }
+
+    // Update current result based on new mode
+    if (result) {
+      if (mode === 'read') {
+        setResult(showAllLetters(result));
+      } else if (mode === 'guess') {
+        setResult(hideRandomLetters(result, lettersToHide));
+      }
+    }
+  }, [result, lettersToHide]);
+
+  // Handle pattern toggle
+  const handleTogglePattern = useCallback((pattern: PatternType) => {
+    setEnabledPatterns(prev => {
+      if (prev.includes(pattern)) {
+        // Don't allow removing last pattern
+        if (prev.length === 1) return prev;
+        return prev.filter(p => p !== pattern);
+      }
+      return [...prev, pattern];
+    });
+  }, []);
+
+  // Auto-generation effect
+  useEffect(() => {
+    if (autoInterval) {
+      const timer = setInterval(handleGenerate, autoInterval);
+      return () => clearInterval(timer);
+    }
+  }, [autoInterval, handleGenerate]);
+
+  // Reveal all shortcut (double-tap anywhere)
+  const handleRevealAll = useCallback(() => {
+    if (result && learningMode === 'guess') {
+      setResult(revealAllLetters(result));
+    }
+  }, [result, learningMode]);
+
+  // Game handlers
+  const handleSelectGame = (game: GameType) => {
+    setSelectedGame(game);
+    setAppView('playing');
+  };
+
+  const handleGameComplete = (state: GameState) => {
+    setCompletedGameState(state);
+    setAppView('complete');
+  };
+
+  const handlePlayAgain = () => {
+    setAppView('playing');
+    setCompletedGameState(null);
+  };
+
+  const handleBackToGames = () => {
+    setAppView('games');
+    setSelectedGame(null);
+    setCompletedGameState(null);
+  };
+
+  // Render the current game
+  const renderGame = () => {
+    if (!selectedGame) return null;
+
+    const gameProps = {
+      difficulty: gameDifficulty,
+      onComplete: handleGameComplete,
+      onBack: handleBackToGames,
+    };
+
+    switch (selectedGame) {
+      case 'matching':
+        return <MatchingGame {...gameProps} />;
+      case 'bubble':
+        return <BubblePopGame {...gameProps} />;
+      case 'memory':
+        return <MemoryGame {...gameProps} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main
+      className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 p-4 md:p-8"
+      onDoubleClick={appView === 'learn' ? handleRevealAll : undefined}
+    >
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Header */}
+        <header className="text-center space-y-2">
+          <h1
+            className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent cursor-pointer"
+            onClick={() => setAppView('learn')}
+          >
+            SomaNeza 📚
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-lg md:text-xl text-gray-600">
+            Iga gusoma Ikinyarwanda! 🇷🇼
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <p className="text-sm text-gray-500">
+            Learn to read Kinyarwanda
+          </p>
+        </header>
+
+        {/* Navigation tabs */}
+        <nav className="flex justify-center gap-4">
+          <button
+            onClick={() => setAppView('learn')}
+            className={`px-6 py-3 rounded-full font-medium transition-all ${appView === 'learn'
+                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
+                : 'bg-white/50 text-gray-700 hover:bg-white/80'
+              }`}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            📖 Iga (Learn)
+          </button>
+          <button
+            onClick={() => setAppView('games')}
+            className={`px-6 py-3 rounded-full font-medium transition-all ${appView === 'games' || appView === 'playing' || appView === 'complete'
+                ? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg'
+                : 'bg-white/50 text-gray-700 hover:bg-white/80'
+              }`}
+          >
+            🎮 Imikino (Games)
+          </button>
+        </nav>
+
+        {/* Learn View */}
+        {appView === 'learn' && (
+          <>
+            {/* Mode Selector */}
+            <section className="bg-white/50 backdrop-blur-sm rounded-3xl p-4 md:p-6 shadow-lg">
+              <ModeSelector
+                currentMode={learningMode}
+                onModeChange={handleModeChange}
+                isTeacherMode={isTeacherMode}
+                onTeacherModeToggle={() => setIsTeacherMode(prev => !prev)}
+              />
+            </section>
+
+            {/* Progressive Mode Stats */}
+            {learningMode === 'progressive' && (
+              <div className="flex items-center justify-center gap-6 text-center">
+                <div className="bg-white rounded-2xl px-6 py-3 shadow-md">
+                  <span className="text-2xl font-bold text-indigo-600">{progressiveLevel}</span>
+                  <span className="text-sm text-gray-500 block">Level</span>
+                </div>
+                <div className="bg-white rounded-2xl px-6 py-3 shadow-md">
+                  <span className="text-2xl font-bold text-emerald-600">{progressiveScore}</span>
+                  <span className="text-sm text-gray-500 block">Score</span>
+                </div>
+              </div>
+            )}
+
+            {/* Pattern Controls (hidden in progressive mode) */}
+            {learningMode !== 'progressive' && (
+              <section className="bg-white/50 backdrop-blur-sm rounded-3xl p-4 shadow-lg">
+                <PatternControls
+                  enabledPatterns={enabledPatterns}
+                  onTogglePattern={handleTogglePattern}
+                />
+              </section>
+            )}
+
+            {/* Main Display Area */}
+            <section className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-xl min-h-[250px] md:min-h-[350px] flex items-center justify-center">
+              <LetterDisplay
+                result={result}
+                onReveal={handleReveal}
+                onToggleHide={handleToggleHide}
+                isTeacherMode={isTeacherMode}
+              />
+            </section>
+
+            {/* Generate Button */}
+            <section className="flex justify-center">
+              <GenerateButton onClick={handleGenerate} />
+            </section>
+
+            {/* Settings Panel */}
+            <section>
+              <SettingsPanel
+                lettersToHide={lettersToHide}
+                onLettersToHideChange={setLettersToHide}
+                autoInterval={autoInterval}
+                onAutoIntervalChange={setAutoInterval}
+                customClusters={customClusters}
+                onCustomClustersChange={setCustomClusters}
+              />
+            </section>
+
+            {/* Help Text */}
+            <footer className="text-center text-sm text-gray-500 space-y-1">
+              <p>
+                {learningMode === 'guess' && '👆 Tap ? to reveal hidden letters • Double-tap to reveal all'}
+                {learningMode === 'read' && '📖 Read the letters aloud!'}
+                {learningMode === 'progressive' && '🎯 Progress through levels by revealing letters correctly!'}
+              </p>
+              {isTeacherMode && (
+                <p className="text-amber-600">
+                  👨‍🏫 Teacher Mode: Tap any letter to hide/show it
+                </p>
+              )}
+            </footer>
+          </>
+        )}
+
+        {/* Games View */}
+        {appView === 'games' && (
+          <section className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-xl">
+            {/* Difficulty selector */}
+            <div className="mb-6 flex justify-center gap-2">
+              {(['easy', 'medium', 'hard'] as GameDifficulty[]).map((diff) => (
+                <button
+                  key={diff}
+                  onClick={() => setGameDifficulty(diff)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${gameDifficulty === diff
+                      ? 'bg-indigo-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                >
+                  {diff === 'easy' ? '⭐ Byoroshye' : diff === 'medium' ? '⭐⭐ Hagati' : '⭐⭐⭐ Bigoye'}
+                </button>
+              ))}
+            </div>
+            <GameSelector onSelectGame={handleSelectGame} />
+          </section>
+        )}
+
+        {/* Playing View */}
+        {appView === 'playing' && (
+          <section className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-xl">
+            {renderGame()}
+          </section>
+        )}
+
+        {/* Complete View */}
+        {appView === 'complete' && completedGameState && (
+          <section className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-xl">
+            <GameComplete
+              state={completedGameState}
+              onPlayAgain={handlePlayAgain}
+              onBackToMenu={handleBackToGames}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+          </section>
+        )}
+      </div>
+    </main>
   );
 }
