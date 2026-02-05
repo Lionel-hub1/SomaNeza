@@ -1,5 +1,6 @@
 export { default as GameSelector } from './GameSelector';
-export { default as MatchingGame } from './MatchingGame';
-export { default as BubblePopGame } from './BubblePopGame';
-export { default as MemoryGame } from './MemoryGame';
+export { default as SoundMatchGame } from './SoundMatchGame';
+export { default as SyllableTrainGame } from './SyllableTrainGame';
+export { default as WordBuilderGame } from './WordBuilderGame';
+export { default as FallingStarsGame } from './FallingStarsGame';
 export { default as GameComplete } from './GameComplete';

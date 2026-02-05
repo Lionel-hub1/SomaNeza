@@ -26,8 +26,8 @@ export type PatternType = 'vowel' | 'consonant' | 'cv' | 'cluster' | 'mixed';
 // Learning modes
 export type LearningMode = 'read' | 'guess' | 'progressive';
 
-// Game types
-export type GameType = 'matching' | 'bubble' | 'memory';
+// Game types - New engaging games for children
+export type GameType = 'soundmatch' | 'train' | 'wordbuilder' | 'stars';
 
 // Game difficulty (number of options/cards)
 export type GameDifficulty = 'easy' | 'medium' | 'hard';
@@ -39,35 +39,92 @@ export interface GameState {
   currentRound: number;
   totalRounds: number;
   isComplete: boolean;
+  streak?: number; // For bonus encouragement
 }
 
-// Matching game option
-export interface MatchOption {
+// Sound match option
+export interface SoundOption {
   id: string;
   syllable: string;
   isCorrect: boolean;
   isSelected: boolean;
+  color: string; // Fun colors for visual appeal
 }
 
-// Bubble for bubble pop game
-export interface Bubble {
+// Train car for syllable train game
+export interface TrainCar {
+  id: string;
+  syllable: string;
+  color: string;
+  isEngine?: boolean;
+}
+
+// Falling star for stars game
+export interface FallingStar {
   id: string;
   syllable: string;
   isCorrect: boolean;
-  isPopped: boolean;
+  isCaught: boolean;
   x: number;
   y: number;
   speed: number;
+  color: string;
+  rotation: number;
 }
 
-// Memory card
-export interface MemoryCard {
+// Word piece for word builder
+export interface WordPiece {
   id: string;
   syllable: string;
-  pairId: string;
-  isFlipped: boolean;
-  isMatched: boolean;
+  position: number;
+  isPlaced: boolean;
+  color: string;
 }
+
+// Simple Kinyarwanda words for WordBuilder (syllable-separated)
+export const SIMPLE_WORDS: { word: string; syllables: string[]; meaning: string; emoji: string }[] = [
+  { word: 'mama', syllables: ['ma', 'ma'], meaning: 'mother', emoji: '👩' },
+  { word: 'papa', syllables: ['pa', 'pa'], meaning: 'father', emoji: '👨' },
+  { word: 'inka', syllables: ['i', 'nka'], meaning: 'cow', emoji: '🐄' },
+  { word: 'inzu', syllables: ['i', 'nzu'], meaning: 'house', emoji: '🏠' },
+  { word: 'ibuka', syllables: ['i', 'bu', 'ka'], meaning: 'remember', emoji: '💭' },
+  { word: 'soma', syllables: ['so', 'ma'], meaning: 'read', emoji: '📖' },
+  { word: 'kino', syllables: ['ki', 'no'], meaning: 'toy/game', emoji: '🧸' },
+  { word: 'imbwa', syllables: ['i', 'mbwa'], meaning: 'dog', emoji: '🐕' },
+  { word: 'intama', syllables: ['i', 'nta', 'ma'], meaning: 'sheep', emoji: '🐑' },
+  { word: 'amazi', syllables: ['a', 'ma', 'zi'], meaning: 'water', emoji: '💧' },
+  { word: 'ibuye', syllables: ['i', 'bu', 'ye'], meaning: 'stone', emoji: '🪨' },
+  { word: 'ikawa', syllables: ['i', 'ka', 'wa'], meaning: 'coffee', emoji: '☕' },
+  { word: 'umuti', syllables: ['u', 'mu', 'ti'], meaning: 'tree', emoji: '🌳' },
+  { word: 'ijoro', syllables: ['i', 'jo', 'ro'], meaning: 'night', emoji: '🌙' },
+  { word: 'izuba', syllables: ['i', 'zu', 'ba'], meaning: 'sun', emoji: '☀️' },
+  { word: 'ukwezi', syllables: ['u', 'kwe', 'zi'], meaning: 'moon', emoji: '🌛' },
+  { word: 'isoko', syllables: ['i', 'so', 'ko'], meaning: 'market', emoji: '🏪' },
+  { word: 'umugabo', syllables: ['u', 'mu', 'ga', 'bo'], meaning: 'man', emoji: '👤' },
+  { word: 'umugore', syllables: ['u', 'mu', 'go', 're'], meaning: 'woman', emoji: '👩' },
+  { word: 'umwana', syllables: ['u', 'mwa', 'na'], meaning: 'child', emoji: '👶' },
+];
+
+// Encouraging messages in Kinyarwanda
+export const ENCOURAGEMENTS = [
+  { text: 'Byiza cyane!', meaning: 'Very good!', emoji: '🎉' },
+  { text: 'Wabikoze neza!', meaning: 'Well done!', emoji: '⭐' },
+  { text: 'Uri umuhanga!', meaning: 'You are smart!', emoji: '🧠' },
+  { text: 'Komeza urtya!', meaning: 'Keep it up!', emoji: '💪' },
+  { text: 'Ni byiza!', meaning: 'That\'s good!', emoji: '👍' },
+  { text: 'Urakoze!', meaning: 'Thank you!', emoji: '🙏' },
+  { text: 'Urashobora!', meaning: 'You can do it!', emoji: '✨' },
+];
+
+// Fun colors for game elements
+export const GAME_COLORS = [
+  'from-pink-400 to-rose-500',
+  'from-purple-400 to-indigo-500',
+  'from-blue-400 to-cyan-500',
+  'from-emerald-400 to-green-500',
+  'from-amber-400 to-orange-500',
+  'from-red-400 to-pink-500',
+];
 
 // Difficulty levels for progressive mode
 export type DifficultyLevel = 1 | 2 | 3;
