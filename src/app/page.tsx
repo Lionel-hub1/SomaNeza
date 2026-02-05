@@ -28,9 +28,10 @@ import PatternControls from '@/components/PatternControls';
 import SettingsPanel from '@/components/SettingsPanel';
 import {
   GameSelector,
-  MatchingGame,
-  BubblePopGame,
-  MemoryGame,
+  SoundMatchGame,
+  SyllableTrainGame,
+  WordBuilderGame,
+  FallingStarsGame,
   GameComplete,
 } from '@/components/games';
 
@@ -192,12 +193,14 @@ export default function Home() {
     };
 
     switch (selectedGame) {
-      case 'matching':
-        return <MatchingGame {...gameProps} />;
-      case 'bubble':
-        return <BubblePopGame {...gameProps} />;
-      case 'memory':
-        return <MemoryGame {...gameProps} />;
+      case 'soundmatch':
+        return <SoundMatchGame {...gameProps} />;
+      case 'train':
+        return <SyllableTrainGame {...gameProps} />;
+      case 'wordbuilder':
+        return <WordBuilderGame {...gameProps} />;
+      case 'stars':
+        return <FallingStarsGame {...gameProps} />;
       default:
         return null;
     }
@@ -230,8 +233,8 @@ export default function Home() {
           <button
             onClick={() => setAppView('learn')}
             className={`px-6 py-3 rounded-full font-medium transition-all ${appView === 'learn'
-                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
-                : 'bg-white/50 text-gray-700 hover:bg-white/80'
+              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
+              : 'bg-white/50 text-gray-700 hover:bg-white/80'
               }`}
           >
             📖 Iga (Learn)
@@ -239,8 +242,8 @@ export default function Home() {
           <button
             onClick={() => setAppView('games')}
             className={`px-6 py-3 rounded-full font-medium transition-all ${appView === 'games' || appView === 'playing' || appView === 'complete'
-                ? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg'
-                : 'bg-white/50 text-gray-700 hover:bg-white/80'
+              ? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg'
+              : 'bg-white/50 text-gray-700 hover:bg-white/80'
               }`}
           >
             🎮 Imikino (Games)
@@ -337,8 +340,8 @@ export default function Home() {
                   key={diff}
                   onClick={() => setGameDifficulty(diff)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${gameDifficulty === diff
-                      ? 'bg-indigo-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-indigo-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
                   {diff === 'easy' ? '⭐ Byoroshye' : diff === 'medium' ? '⭐⭐ Hagati' : '⭐⭐⭐ Bigoye'}
