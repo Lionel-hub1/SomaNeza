@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SomaNeza
 
-## Getting Started
+**SomaNeza** (Kinyarwanda for "Read Well") is an interactive educational platform designed to teach Kinyarwanda phonetics and literacy. Built with modern web technologies, it offers a suite of customizable tools and games that help learners master the structure of the Kinyarwanda language—from basic vowels to complex consonant clusters.
 
-First, run the development server:
+## 🚀 Key Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Advanced Phonetic Engine
+
+SomaNeza is built on a robust linguistic foundation specifically for Kinyarwanda:
+
+- **Comprehensive Syllabary**: Support for standard vowels, consonants, and over 70 complex consonant clusters (e.g., _mbw_, _nshy_, _mbyw_).
+- **Pattern-Based Generation**: Dynamically generate content based on specific phonetic needs (Vowels, Consonant + Vowel, Clusters, etc.).
+- **Difficulty Scaling**: Adjustable complexity algorithms to match the learner's proficiency.
+
+### Adaptive Learning Modes
+
+- **Read Mode**: Distraction-free display for practicing pronunciation and reading flow.
+- **Guess Mode**: Interactive hide/reveal mechanics to test immediate recall.
+- **Progressive Mode**: Scaffolds learning by gradually introducing more complex patterns.
+- **Teacher Mode**: Specialized controls giving instructors fine-grained command over the displayed content for classroom settings.
+
+## 🎮 Interactive Games
+
+Gamified exercises designed to reinforce phonetic recognition and retention:
+
+- **🧩 Matching Game**: Test pattern recognition by pairing matching syllables.
+- **🫧 Bubble Pop**: A reflex-based game to identify correct phonemes rapidly.
+- **🧠 Memory Game**: Classic concentration gameplay to build retention of complex clusters.
+
+## 🛠️ Technology Stack
+
+This project leverages the latest ecosystem improvements for performance and developer experience:
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Directory)
+- **Core**: [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/) for full type safety
+- **Linting**: ESLint
+
+## 🏁 Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher recommended)
+- npm, yarn, pnpm, or bun
+
+### Installation
+
+1.  Clone the repository:
+
+    ```bash
+    git clone https://github.com/yourusername/somaneza.git
+    cd somaneza
+    ```
+
+2.  Install dependencies:
+
+    ```bash
+    npm install
+    # or
+    yarn install
+    # or
+    pnpm install
+    ```
+
+3.  Run the development server:
+    ```bash
+    npm run dev
+    ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📂 Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/                  # Next.js App Router pages
+├── components/           # UI Components
+│   ├── games/            # Game logic and interfaces
+│   ├── LetterDisplay.tsx # Main visualization component
+│   └── ...
+└── lib/
+    ├── kinyarwanda.ts    # Linguistic rules and definitions
+    └── generator.ts      # Content generation algorithms
+```
 
-## Learn More
+## 🤝 Contributing
 
-To learn more about Next.js, take a look at the following resources:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📄 License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is open-source and available under the MIT License — see the [LICENSE](LICENSE) file for the full text.
