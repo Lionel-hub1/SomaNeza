@@ -5,9 +5,44 @@ import {
     VOWELS,
     CONSONANTS,
     PatternType,
-    GeneratedResult,
     LetterState,
+    SIMPLE_WORDS,
+    GeneratedResult,
 } from './kinyarwanda';
+
+// Generate a word-based result
+export function generateWord(filter: 'all' | 'no-clusters' | 'only-clusters'): GeneratedResult {
+    let filteredWords = [...SIMPLE_WORDS];
+
+    if (filter === 'no-clusters') {
+        filteredWords = SIMPLE_WORDS.filter(w =>
+            !w.syllables.some(s => s.length > 2)
+        );
+    } else if (filter === 'only-clusters') {
+        filteredWords = SIMPLE_WORDS.filter(w =>
+            w.syllables.some(s => s.length > 2)
+        );
+    }
+
+    // Fallback if filter is too strict
+    if (filteredWords.length === 0) filteredWords = [...SIMPLE_WORDS];
+
+    const wordObj = filteredWords[Math.floor(Math.random() * filteredWords.length)];
+    const letters = wordObj.word.split('');
+
+    return {
+        letters,
+        display: wordObj.word,
+        pattern: 'word',
+        emoji: wordObj.emoji,
+        meaning: wordObj.meaning,
+        letterStates: letters.map(letter => ({
+            letter,
+            isHidden: false,
+            isRevealed: false
+        }))
+    };
+}
 
 // Split a cluster into individual letters
 export function splitIntoLetters(text: string): string[] {
@@ -144,6 +179,7 @@ export function generate(
         clusterConsonantCounts: number[] | 'all';
         prioritizedConsonants: string[];
         prioritizedClusters: string[];
+        wordFilter: 'all' | 'no-clusters' | 'only-clusters';
     }
 ): GeneratedResult {
     if (enabledPatterns.length === 0) {
@@ -166,9 +202,11 @@ export function generate(
                 settings.clusterConsonantCounts,
                 settings.prioritizedClusters
             );
+        case 'word':
+            return generateWord(settings.wordFilter);
         case 'mixed':
             // For mixed, randomly choose from all types
-            const allPatterns: PatternType[] = ['vowel', 'consonant', 'cv', 'cluster'];
+            const allPatterns: PatternType[] = ['vowel', 'consonant', 'cv', 'cluster', 'word'];
             const randomPattern = getRandomElement(allPatterns);
             return generate([randomPattern], settings);
         default:
@@ -179,17 +217,36 @@ export function generate(
 // Hide random letters in the result
 export function hideRandomLetters(
     result: GeneratedResult,
-    count: number
+    count: number,
+    hideTarget: 'vowels' | 'consonants' | 'both' = 'both'
 ): GeneratedResult {
     const letterCount = result.letters.length;
-    const hideCount = Math.min(count, letterCount - 1); // Always show at least one
 
-    // Get random indices to hide
-    const indices = Array.from({ length: letterCount }, (_, i) => i);
-    const shuffled = indices.sort(() => Math.random() - 0.5);
-    const indicesToHide = new Set(shuffled.slice(0, hideCount));
+    // Determine target characters for this generation
+    let targets = hideTarget;
+    if (hideTarget === 'both') {
+        targets = Math.random() < 0.5 ? 'vowels' : 'consonants';
+    }
 
-    const newLetterStates: LetterState[] = result.letters.map((letter, index) => ({
+    // Identify indices that match the target category
+    const validIndices = result.letters.map((letter: string, index: number) => {
+        const isVowel = VOWELS.includes(letter.toLowerCase() as any);
+        if (targets === 'vowels' && isVowel) return index;
+        if (targets === 'consonants' && !isVowel) return index;
+        return -1;
+    }).filter((index: number) => index !== -1);
+
+    // If no matches for the target, fallback to any random letters
+    const indicesToPool = validIndices.length > 0 ? validIndices : Array.from({ length: letterCount }, (_: any, i: number) => i);
+
+    // For words, we often want to hide just one letter as requested by user
+    const effectiveCount = result.pattern === 'word' ? 1 : Math.min(count, indicesToPool.length);
+
+    // Get random indices to hide from the pool
+    const shuffled = [...indicesToPool].sort(() => Math.random() - 0.5);
+    const indicesToHide = new Set(shuffled.slice(0, effectiveCount));
+
+    const newLetterStates: LetterState[] = result.letters.map((letter: string, index: number) => ({
         letter,
         isHidden: indicesToHide.has(index),
         isRevealed: false

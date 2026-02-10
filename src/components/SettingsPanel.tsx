@@ -16,6 +16,12 @@ interface SettingsPanelProps {
     onPrioritizedConsonantsChange: (consonants: string[]) => void;
     prioritizedClusters: string[];
     onPrioritizedClustersChange: (clusters: string[]) => void;
+    hideTarget: 'vowels' | 'consonants' | 'both';
+    onHideTargetChange: (target: 'vowels' | 'consonants' | 'both') => void;
+    wordFilter: 'all' | 'no-clusters' | 'only-clusters';
+    onWordFilterChange: (filter: 'all' | 'no-clusters' | 'only-clusters') => void;
+    soundEnabled: boolean;
+    onSoundEnabledChange: (enabled: boolean) => void;
 }
 
 export default function SettingsPanel({
@@ -30,7 +36,13 @@ export default function SettingsPanel({
     prioritizedConsonants,
     onPrioritizedConsonantsChange,
     prioritizedClusters,
-    onPrioritizedClustersChange
+    onPrioritizedClustersChange,
+    hideTarget,
+    onHideTargetChange,
+    wordFilter,
+    onWordFilterChange,
+    soundEnabled,
+    onSoundEnabledChange
 }: SettingsPanelProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'general' | 'consonants' | 'clusters'>('general');
@@ -86,7 +98,7 @@ export default function SettingsPanel({
                         {[
                             { id: 'general', label: 'Rusange', sub: 'General' },
                             { id: 'consonants', label: 'Ingombajwi', sub: 'Consonants' },
-                            { id: 'clusters', label: 'Udukwata', sub: 'Clusters' }
+                            { id: 'clusters', label: 'ibihekane', sub: 'Clusters' }
                         ].map(tab => (
                             <button
                                 key={tab.id}
@@ -106,6 +118,19 @@ export default function SettingsPanel({
                     <div className="min-h-[300px]">
                         {activeTab === 'general' && (
                             <div className="space-y-8 animate-in fade-in duration-500">
+                                {/* Sound Toggle */}
+                                <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">
+                                        Amajwi (Sound)
+                                        <span className="block text-[10px] text-gray-400 font-normal">Enable/disable app sounds</span>
+                                    </label>
+                                    <button
+                                        onClick={() => onSoundEnabledChange(!soundEnabled)}
+                                        className={`w-14 h-8 rounded-full transition-all relative ${soundEnabled ? 'bg-indigo-500' : 'bg-gray-200'}`}
+                                    >
+                                        <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all ${soundEnabled ? 'left-7' : 'left-1'}`} />
+                                    </button>
+                                </div>
                                 {/* Letters to Hide */}
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-end">
@@ -153,7 +178,7 @@ export default function SettingsPanel({
                                 {/* Cluster Length Filter */}
                                 <div className="space-y-4">
                                     <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">
-                                        Uburebure bw'udukwata
+                                        Uburebure bw'ibihekane
                                         <span className="block text-[10px] text-gray-400 font-normal">Filter by Consonant Count</span>
                                     </label>
                                     <div className="flex flex-wrap gap-2">

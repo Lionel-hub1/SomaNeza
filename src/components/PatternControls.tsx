@@ -12,7 +12,8 @@ const patterns: { value: PatternType; label: string; emoji: string; example: str
     { value: 'vowel', label: 'Inyajwi', emoji: '🔴', example: 'a, e, i' },
     { value: 'consonant', label: 'Ingombajwi', emoji: '🔵', example: 'b, k, m' },
     { value: 'cv', label: 'C+V', emoji: '🟢', example: 'ba, ke, mi' },
-    { value: 'cluster', label: 'Cluster+V', emoji: '🟣', example: 'kwa, nya, shya' }
+    { value: 'cluster', label: 'Cluster+V', emoji: '🟣', example: 'kwa, nya, shya' },
+    { value: 'word', label: 'Ijambo', emoji: '🖼️', example: 'mama, inka' }
 ];
 
 export default function PatternControls({

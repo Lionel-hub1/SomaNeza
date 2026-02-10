@@ -21,7 +21,7 @@ export const DEFAULT_CONSONANT_CLUSTERS = [
 ] as const;
 
 // Pattern types for generation
-export type PatternType = 'vowel' | 'consonant' | 'cv' | 'cluster' | 'mixed';
+export type PatternType = 'vowel' | 'consonant' | 'cv' | 'cluster' | 'word' | 'mixed';
 
 // Learning modes
 export type LearningMode = 'read' | 'guess' | 'progressive';
@@ -103,6 +103,37 @@ export const SIMPLE_WORDS: { word: string; syllables: string[]; meaning: string;
   { word: 'umugabo', syllables: ['u', 'mu', 'ga', 'bo'], meaning: 'man', emoji: '👤' },
   { word: 'umugore', syllables: ['u', 'mu', 'go', 're'], meaning: 'woman', emoji: '👩' },
   { word: 'umwana', syllables: ['u', 'mwa', 'na'], meaning: 'child', emoji: '👶' },
+  // New words
+  { word: 'umupira', syllables: ['u', 'mu', 'pi', 'ra'], meaning: 'ball', emoji: '⚽' },
+  { word: 'imodoka', syllables: ['i', 'mo', 'do', 'ka'], meaning: 'car', emoji: '🚗' },
+  { word: 'indege', syllables: ['i', 'nde', 'ge'], meaning: 'airplane', emoji: '✈️' },
+  { word: 'igare', syllables: ['i', 'ga', 're'], meaning: 'bicycle', emoji: '🚲' },
+  { word: 'ishuri', syllables: ['i', 'shu', 'ri'], meaning: 'school', emoji: '🏫' },
+  { word: 'ikaramu', syllables: ['i', 'ka', 'ra', 'mu'], meaning: 'pen', emoji: '🖊️' },
+  { word: 'igitabo', syllables: ['i', 'gi', 'ta', 'bo'], meaning: 'book', emoji: '📚' },
+  { word: 'intebe', syllables: ['i', 'nte', 'be'], meaning: 'chair', emoji: '🪑' },
+  { word: 'ameza', syllables: ['a', 'me', 'za'], meaning: 'table', emoji: '🪑' },
+  { word: 'isahani', syllables: ['i', 'sa', 'ha', 'ni'], meaning: 'plate', emoji: '🍽️' },
+  { word: 'ikiyiko', syllables: ['i', 'ki', 'yi', 'ko'], meaning: 'spoon', emoji: '🥄' },
+  { word: 'imboga', syllables: ['i', 'mbo', 'ga'], meaning: 'vegetables', emoji: '🥬' },
+  { word: 'imbuto', syllables: ['i', 'mbu', 'to'], meaning: 'fruits', emoji: '🍎' },
+  { word: 'amata', syllables: ['a', 'ma', 'ta'], meaning: 'milk', emoji: '🥛' },
+  { word: 'umugati', syllables: ['u', 'mu', 'ga', 'ti'], meaning: 'bread', emoji: '🍞' },
+  { word: 'igi', syllables: ['i', 'gi'], meaning: 'egg', emoji: '🥚' },
+  { word: 'ifi', syllables: ['i', 'fi'], meaning: 'fish', emoji: '🐟' },
+  { word: 'inkoko', syllables: ['i', 'nko', 'ko'], meaning: 'chicken', emoji: '🐔' },
+  { word: 'urukwavu', syllables: ['u', 'ru', 'kwa', 'vu'], meaning: 'rabbit', emoji: '🐇' },
+  { word: 'injangwe', syllables: ['i', 'nja', 'ngwe'], meaning: 'cat', emoji: '🐱' },
+  { word: 'inzovu', syllables: ['i', 'nzo', 'vu'], meaning: 'elephant', emoji: '🐘' },
+  { word: 'intare', syllables: ['i', 'nta', 're'], meaning: 'lion', emoji: '🦁' },
+  { word: 'ingagi', syllables: ['i', 'nga', 'gi'], meaning: 'gorilla', emoji: '🦍' },
+  { word: 'isaha', syllables: ['i', 'sa', 'ha'], meaning: 'watch/clock', emoji: '⌚' },
+  { word: 'inkweto', syllables: ['i', 'nkwe', 'to'], meaning: 'shoes', emoji: '👞' },
+  { word: 'ikoti', syllables: ['i', 'ko', 'ti'], meaning: 'coat', emoji: '🧥' },
+  { word: 'isogisi', syllables: ['i', 'so', 'gi', 'si'], meaning: 'socks', emoji: '🧦' },
+  { word: 'umutaka', syllables: ['u', 'mu', 'ta', 'ka'], meaning: 'umbrella', emoji: '☂️' },
+  { word: 'indabo', syllables: ['i', 'nda', 'bo'], meaning: 'flowers', emoji: '💐' },
+  { word: 'igiti', syllables: ['i', 'gi', 'ti'], meaning: 'tree', emoji: '🌳' },
 ];
 
 // Encouraging messages in Kinyarwanda
@@ -156,6 +187,8 @@ export interface GeneratedResult {
   display: string;        // Combined display: "kwa"
   pattern: PatternType;   // What pattern was used
   letterStates: LetterState[];  // State for each letter
+  emoji?: string;        // For word pattern
+  meaning?: string;      // For word pattern
 }
 
 // Settings interface
@@ -167,6 +200,9 @@ export interface AppSettings {
   clusterConsonantCounts: number[] | 'all';
   prioritizedConsonants: string[];
   prioritizedClusters: string[];
+  hideTarget: 'vowels' | 'consonants' | 'both';
+  wordFilter: 'all' | 'no-clusters' | 'only-clusters';
+  soundEnabled: boolean;
 }
 
 // Default settings
@@ -177,5 +213,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   customClusters: [...DEFAULT_CONSONANT_CLUSTERS],
   clusterConsonantCounts: 'all',
   prioritizedConsonants: [],
-  prioritizedClusters: []
+  prioritizedClusters: [],
+  hideTarget: 'both',
+  wordFilter: 'all',
+  soundEnabled: true
 };

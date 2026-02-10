@@ -12,6 +12,7 @@ import {
   GameType,
   GameDifficulty,
   GameState,
+  LetterState,
 } from '@/lib/kinyarwanda';
 import {
   generate,
@@ -69,6 +70,13 @@ export default function Home() {
   const [prioritizedClusters, setPrioritizedClusters] = useState<string[]>(
     DEFAULT_SETTINGS.prioritizedClusters
   );
+  const [hideTarget, setHideTarget] = useState<'vowels' | 'consonants' | 'both'>(
+    DEFAULT_SETTINGS.hideTarget
+  );
+  const [wordFilter, setWordFilter] = useState<'all' | 'no-clusters' | 'only-clusters'>(
+    DEFAULT_SETTINGS.wordFilter
+  );
+  const [soundEnabled, setSoundEnabled] = useState(DEFAULT_SETTINGS.soundEnabled);
 
   // Progressive mode state
   const [progressiveLevel, setProgressiveLevel] = useState<DifficultyLevel>(1);
@@ -88,11 +96,12 @@ export default function Home() {
       clusterConsonantCounts,
       prioritizedConsonants,
       prioritizedClusters,
+      wordFilter,
     });
 
     // Apply hiding based on mode
     if (learningMode === 'guess') {
-      newResult = hideRandomLetters(newResult, lettersToHide);
+      newResult = hideRandomLetters(newResult, lettersToHide, hideTarget);
     }
 
     setResult(newResult);
@@ -105,6 +114,8 @@ export default function Home() {
     clusterConsonantCounts,
     prioritizedConsonants,
     prioritizedClusters,
+    hideTarget,
+    wordFilter,
   ]);
 
   // Handle letter reveal (for guess mode)
@@ -116,7 +127,7 @@ export default function Home() {
       // Check if all revealed in progressive mode
       if (learningMode === 'progressive') {
         const allRevealed = newResult.letterStates.every(
-          s => !s.isHidden || s.isRevealed
+          (s: LetterState) => !s.isHidden || s.isRevealed
         );
         if (allRevealed) {
           setProgressiveScore(prev => prev + 1);
@@ -213,6 +224,7 @@ export default function Home() {
       difficulty: gameDifficulty,
       onComplete: handleGameComplete,
       onBack: handleBackToGames,
+      soundEnabled,
     };
 
     switch (selectedGame) {
@@ -317,6 +329,7 @@ export default function Home() {
                 onReveal={handleReveal}
                 onToggleHide={handleToggleHide}
                 isTeacherMode={isTeacherMode}
+                learningMode={learningMode}
               />
             </section>
 
@@ -340,6 +353,12 @@ export default function Home() {
                 onPrioritizedConsonantsChange={setPrioritizedConsonants}
                 prioritizedClusters={prioritizedClusters}
                 onPrioritizedClustersChange={setPrioritizedClusters}
+                hideTarget={hideTarget}
+                onHideTargetChange={setHideTarget}
+                wordFilter={wordFilter}
+                onWordFilterChange={setWordFilter}
+                soundEnabled={soundEnabled}
+                onSoundEnabledChange={setSoundEnabled}
               />
             </section>
 

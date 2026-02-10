@@ -17,9 +17,10 @@ interface WordBuilderGameProps {
     difficulty: GameDifficulty;
     onComplete: (state: GameState) => void;
     onBack: () => void;
+    soundEnabled?: boolean;
 }
 
-export default function WordBuilderGame({ difficulty, onComplete, onBack }: WordBuilderGameProps) {
+export default function WordBuilderGame({ difficulty, onComplete, onBack, soundEnabled = true }: WordBuilderGameProps) {
     const [gameState, setGameState] = useState<GameState>(() => initializeGameState(difficulty));
     const [currentWord, setCurrentWord] = useState<typeof SIMPLE_WORDS[0] | null>(null);
     const [pieces, setPieces] = useState<WordPiece[]>([]);
@@ -80,7 +81,7 @@ export default function WordBuilderGame({ difficulty, onComplete, onBack }: Word
         ));
 
         // Speak the syllable
-        speakSyllable(piece.syllable);
+        speakSyllable(piece.syllable, soundEnabled);
 
         // Check if word is complete
         const allFilled = newPlacedPieces.every(p => p !== null);
@@ -121,7 +122,7 @@ export default function WordBuilderGame({ difficulty, onComplete, onBack }: Word
             setEncouragement(getRandomEncouragement());
 
             // Speak the complete word
-            setTimeout(() => speakSyllable(currentWord.word), 500);
+            setTimeout(() => speakSyllable(currentWord.word, soundEnabled), 500);
 
             const newState = handleCorrectAnswer(gameState);
             setGameState(newState);

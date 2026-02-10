@@ -8,13 +8,15 @@ interface LetterDisplayProps {
     onReveal: (index: number) => void;
     onToggleHide: (index: number) => void;
     isTeacherMode: boolean;
+    learningMode?: 'read' | 'guess' | 'progressive';
 }
 
 export default function LetterDisplay({
     result,
     onReveal,
     onToggleHide,
-    isTeacherMode
+    isTeacherMode,
+    learningMode = 'read'
 }: LetterDisplayProps) {
     if (!result) {
         return (
@@ -29,10 +31,31 @@ export default function LetterDisplay({
         );
     }
 
+    // Calculate size based on letter count
+    const letterCount = result.letterStates.length;
+    let size: 'normal' | 'compact' | 'tiny' | 'fluid' = 'normal';
+    let gapClass = 'gap-3 md:gap-6';
+
+    if (letterCount > 12) {
+        size = 'fluid';
+        gapClass = 'gap-1';
+    } else if (letterCount > 8) {
+        size = 'tiny';
+        gapClass = 'gap-1 md:gap-2';
+    } else if (letterCount > 5) {
+        size = 'compact';
+        gapClass = 'gap-2 md:gap-4';
+    }
+
     return (
-        <div className="flex flex-col items-center gap-6">
-            {/* Main letter display */}
-            <div className="flex items-center justify-center gap-3 md:gap-6 flex-wrap">
+        <div className="flex flex-col items-center gap-8 w-full max-w-full px-4 md:px-8">
+            {result.emoji && result.pattern === 'word' && (
+                <div className="text-8xl md:text-9xl animate-bounce-in mb-4">
+                    {result.emoji}
+                </div>
+            )}
+
+            <div className={`flex flex-nowrap justify-center ${gapClass} w-full px-4 md:px-8`}>
                 {result.letterStates.map((letterState, index) => (
                     <LetterCard
                         key={`${result.display}-${index}`}
@@ -41,19 +64,19 @@ export default function LetterDisplay({
                         onReveal={onReveal}
                         onToggleHide={onToggleHide}
                         isTeacherMode={isTeacherMode}
+                        size={size}
                     />
                 ))}
             </div>
 
-            {/* Pattern indicator */}
-            <div className="text-sm md:text-base text-gray-500 font-medium">
-                {getPatternLabel(result.pattern)}
-            </div>
-
-            {/* Teacher mode hint */}
-            {isTeacherMode && (
-                <div className="text-xs md:text-sm text-amber-600 bg-amber-50 px-4 py-2 rounded-full">
-                    👆 Tap any letter to hide/show it for the student
+            {result.meaning && result.pattern === 'word' && (
+                <div className="text-center animate-in fade-in duration-700 delay-300">
+                    {learningMode !== 'guess' && (
+                        <p className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent uppercase tracking-wider">
+                            {result.display}
+                        </p>
+                    )}
+                    <p className="text-gray-400 text-sm font-medium italic mt-1">{result.meaning}</p>
                 </div>
             )}
         </div>
@@ -70,6 +93,8 @@ function getPatternLabel(pattern: string): string {
             return '📝 Consonant + Vowel';
         case 'cluster':
             return '📚 Cluster + Vowel';
+        case 'word':
+            return '🖼️ Word (Ijambo)';
         case 'mixed':
             return '🎲 Mixed';
         default:

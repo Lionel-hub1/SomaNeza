@@ -294,7 +294,9 @@ export function handleWrongAnswer(state: GameState): GameState {
 
 // Speech synthesis helper (for sound-based games)
 // Kinyarwanda is not well-supported, so we use languages with similar phonetics
-export function speakSyllable(syllable: string): void {
+export function speakSyllable(syllable: string, soundEnabled: boolean = true): void {
+    if (!soundEnabled) return;
+
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         // Cancel any ongoing speech
         window.speechSynthesis.cancel();
