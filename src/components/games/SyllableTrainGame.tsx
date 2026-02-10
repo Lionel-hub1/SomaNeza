@@ -11,6 +11,7 @@ import {
     createEngine,
     speakSyllable,
     getRandomEncouragement,
+    initVoices,
 } from '@/lib/games';
 
 interface SyllableTrainGameProps {
@@ -28,6 +29,11 @@ export default function SyllableTrainGame({ difficulty, onComplete, onBack }: Sy
     const [train, setTrain] = useState<TrainCar[]>([createEngine()]);
     const [encouragement, setEncouragement] = useState<{ text: string; emoji: string } | null>(null);
     const [isTrainMoving, setIsTrainMoving] = useState(false);
+
+    // Initialize voices on mount
+    useEffect(() => {
+        initVoices();
+    }, []);
 
     // Generate new round
     const generateNewRound = useCallback(() => {

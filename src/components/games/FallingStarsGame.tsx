@@ -9,6 +9,7 @@ import {
     handleWrongAnswer,
     speakSyllable,
     getRandomEncouragement,
+    initVoices,
 } from '@/lib/games';
 
 // Generate background stars once outside component
@@ -38,6 +39,11 @@ export default function FallingStarsGame({ difficulty, onComplete, onBack }: Fal
 
     // Pre-generate background stars only once
     const [backgroundStars] = useState(generateBackgroundStars);
+
+    // Initialize voices on mount
+    useEffect(() => {
+        initVoices();
+    }, []);
 
     // Generate new round
     const generateNewRound = useCallback(() => {

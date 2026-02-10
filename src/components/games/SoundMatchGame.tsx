@@ -9,6 +9,7 @@ import {
     handleWrongAnswer,
     speakSyllable,
     getRandomEncouragement,
+    initVoices,
 } from '@/lib/games';
 
 interface SoundMatchGameProps {
@@ -25,6 +26,11 @@ export default function SoundMatchGame({ difficulty, onComplete, onBack }: Sound
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [encouragement, setEncouragement] = useState<{ text: string; emoji: string } | null>(null);
     const [showTarget, setShowTarget] = useState(false);
+
+    // Initialize voices on mount
+    useEffect(() => {
+        initVoices();
+    }, []);
 
     // Generate new round
     const generateNewRound = useCallback(() => {

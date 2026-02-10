@@ -10,6 +10,7 @@ import {
     handleWrongAnswer,
     speakSyllable,
     getRandomEncouragement,
+    initVoices,
 } from '@/lib/games';
 
 interface WordBuilderGameProps {
@@ -27,6 +28,11 @@ export default function WordBuilderGame({ difficulty, onComplete, onBack }: Word
     const [encouragement, setEncouragement] = useState<{ text: string; emoji: string } | null>(null);
     const [showMeaning, setShowMeaning] = useState(false);
     const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
+
+    // Initialize voices on mount
+    useEffect(() => {
+        initVoices();
+    }, []);
 
     // Generate new word
     const generateNewWord = useCallback(() => {
