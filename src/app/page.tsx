@@ -60,6 +60,15 @@ export default function Home() {
   const [customClusters, setCustomClusters] = useState<string[]>(
     [...DEFAULT_CONSONANT_CLUSTERS]
   );
+  const [clusterConsonantCounts, setClusterConsonantCounts] = useState<number[] | 'all'>(
+    DEFAULT_SETTINGS.clusterConsonantCounts
+  );
+  const [prioritizedConsonants, setPrioritizedConsonants] = useState<string[]>(
+    DEFAULT_SETTINGS.prioritizedConsonants
+  );
+  const [prioritizedClusters, setPrioritizedClusters] = useState<string[]>(
+    DEFAULT_SETTINGS.prioritizedClusters
+  );
 
   // Progressive mode state
   const [progressiveLevel, setProgressiveLevel] = useState<DifficultyLevel>(1);
@@ -74,7 +83,12 @@ export default function Home() {
       patterns = getPatternsForDifficulty(progressiveLevel);
     }
 
-    let newResult = generate(patterns, customClusters);
+    let newResult = generate(patterns, {
+      customClusters,
+      clusterConsonantCounts,
+      prioritizedConsonants,
+      prioritizedClusters,
+    });
 
     // Apply hiding based on mode
     if (learningMode === 'guess') {
@@ -82,7 +96,16 @@ export default function Home() {
     }
 
     setResult(newResult);
-  }, [enabledPatterns, learningMode, progressiveLevel, customClusters, lettersToHide]);
+  }, [
+    enabledPatterns,
+    learningMode,
+    progressiveLevel,
+    customClusters,
+    lettersToHide,
+    clusterConsonantCounts,
+    prioritizedConsonants,
+    prioritizedClusters,
+  ]);
 
   // Handle letter reveal (for guess mode)
   const handleReveal = useCallback((index: number) => {
@@ -311,6 +334,12 @@ export default function Home() {
                 onAutoIntervalChange={setAutoInterval}
                 customClusters={customClusters}
                 onCustomClustersChange={setCustomClusters}
+                clusterConsonantCounts={clusterConsonantCounts}
+                onClusterConsonantCountsChange={setClusterConsonantCounts}
+                prioritizedConsonants={prioritizedConsonants}
+                onPrioritizedConsonantsChange={setPrioritizedConsonants}
+                prioritizedClusters={prioritizedClusters}
+                onPrioritizedClustersChange={setPrioritizedClusters}
               />
             </section>
 
