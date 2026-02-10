@@ -21,6 +21,32 @@ function getRandomElement<T>(arr: readonly T[] | T[]): T {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
+// Weighted selection helper
+function pickWeighted<T>(
+    items: T[],
+    prioritizedItems: T[],
+    priorityWeight: number = 0.7
+): T {
+    if (items.length === 0) return items[0]; // Should not happen with valid settings
+    if (prioritizedItems.length === 0) return getRandomElement(items);
+
+    // Filter prioritizedItems to ensure they are actually in the available items
+    const validPrioritized = prioritizedItems.filter(item => {
+        if (typeof item === 'string') {
+            return (items as unknown as string[]).includes(item);
+        }
+        return false;
+    });
+
+    if (validPrioritized.length === 0) return getRandomElement(items);
+
+    // 70% chance to pick from prioritized, 30% from all
+    if (Math.random() < priorityWeight) {
+        return getRandomElement(validPrioritized);
+    }
+    return getRandomElement(items);
+}
+
 // Generate a vowel-only result
 export function generateVowel(): GeneratedResult {
     const vowel = getRandomElement(VOWELS);
@@ -56,8 +82,8 @@ export function generateConsonant(): GeneratedResult {
 }
 
 // Generate a consonant + vowel (CV) combination
-export function generateCV(): GeneratedResult {
-    const consonant = getRandomElement(CONSONANTS);
+export function generateCV(prioritizedConsonants: string[] = []): GeneratedResult {
+    const consonant = pickWeighted([...CONSONANTS], prioritizedConsonants);
     const vowel = getRandomElement(VOWELS);
     const letters = [consonant, vowel];
 
@@ -74,8 +100,26 @@ export function generateCV(): GeneratedResult {
 }
 
 // Generate a consonant cluster + vowel combination
-export function generateClusterV(customClusters: string[]): GeneratedResult {
-    const cluster = getRandomElement(customClusters);
+export function generateClusterV(
+    customClusters: string[],
+    clusterConsonantCounts: number[] | 'all',
+    prioritizedClusters: string[] = []
+): GeneratedResult {
+    let availableClusters = [...customClusters];
+
+    // Filter by length if needed
+    if (clusterConsonantCounts !== 'all' && clusterConsonantCounts.length > 0) {
+        availableClusters = availableClusters.filter(cluster =>
+            clusterConsonantCounts.includes(cluster.length)
+        );
+    }
+
+    // If filter leaves no clusters, fallback to all available
+    if (availableClusters.length === 0) {
+        availableClusters = [...customClusters];
+    }
+
+    const cluster = pickWeighted(availableClusters, prioritizedClusters);
     const vowel = getRandomElement(VOWELS);
     const clusterLetters = splitIntoLetters(cluster);
     const letters = [...clusterLetters, vowel];
@@ -95,7 +139,12 @@ export function generateClusterV(customClusters: string[]): GeneratedResult {
 // Main generation function - generates based on enabled patterns
 export function generate(
     enabledPatterns: PatternType[],
-    customClusters: string[]
+    settings: {
+        customClusters: string[];
+        clusterConsonantCounts: number[] | 'all';
+        prioritizedConsonants: string[];
+        prioritizedClusters: string[];
+    }
 ): GeneratedResult {
     if (enabledPatterns.length === 0) {
         // Default to vowel if nothing enabled
@@ -110,17 +159,18 @@ export function generate(
         case 'consonant':
             return generateConsonant();
         case 'cv':
-            return generateCV();
+            return generateCV(settings.prioritizedConsonants);
         case 'cluster':
-            return generateClusterV(customClusters);
+            return generateClusterV(
+                settings.customClusters,
+                settings.clusterConsonantCounts,
+                settings.prioritizedClusters
+            );
         case 'mixed':
             // For mixed, randomly choose from all types
             const allPatterns: PatternType[] = ['vowel', 'consonant', 'cv', 'cluster'];
             const randomPattern = getRandomElement(allPatterns);
-            if (randomPattern === 'cluster') {
-                return generateClusterV(customClusters);
-            }
-            return generate([randomPattern], customClusters);
+            return generate([randomPattern], settings);
         default:
             return generateVowel();
     }

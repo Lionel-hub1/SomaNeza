@@ -164,6 +164,9 @@ export interface AppSettings {
   autoGenerateInterval: number | null; // null means disabled, number is ms
   enabledPatterns: PatternType[];
   customClusters: string[];
+  clusterConsonantCounts: number[] | 'all';
+  prioritizedConsonants: string[];
+  prioritizedClusters: string[];
 }
 
 // Default settings
@@ -171,5 +174,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   lettersToHide: 1,
   autoGenerateInterval: null,
   enabledPatterns: ['vowel', 'cv', 'cluster'],
-  customClusters: [...DEFAULT_CONSONANT_CLUSTERS]
+  customClusters: [...DEFAULT_CONSONANT_CLUSTERS],
+  clusterConsonantCounts: 'all',
+  prioritizedConsonants: [],
+  prioritizedClusters: []
 };

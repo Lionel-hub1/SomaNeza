@@ -293,12 +293,68 @@ export function handleWrongAnswer(state: GameState): GameState {
 }
 
 // Speech synthesis helper (for sound-based games)
-export function speakSyllable(syllable: string, lang: string = 'rw'): void {
+// Kinyarwanda is not well-supported, so we use languages with similar phonetics
+export function speakSyllable(syllable: string): void {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+
         const utterance = new SpeechSynthesisUtterance(syllable);
-        utterance.lang = lang;
-        utterance.rate = 0.8; // Slightly slower for learning
+
+        // Get available voices
+        const voices = window.speechSynthesis.getVoices();
+
+        // Preferred languages in order (Kinyarwanda vowels are similar to Italian/Spanish/Swahili)
+        // Swahili (sw) - closest Bantu language
+        // Italian (it) - pure vowels like Kinyarwanda
+        // Spanish (es) - also has pure vowels
+        // French (fr) - better than English for vowels
+        const preferredLangs = ['sw', 'it', 'es', 'fr', 'pt'];
+
+        let selectedVoice = null;
+
+        // Try to find a voice matching our preferred languages
+        for (const lang of preferredLangs) {
+            selectedVoice = voices.find(v => v.lang.startsWith(lang));
+            if (selectedVoice) break;
+        }
+
+        // If no preferred voice found, try to avoid English
+        if (!selectedVoice) {
+            selectedVoice = voices.find(v => !v.lang.startsWith('en'));
+        }
+
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+            utterance.lang = selectedVoice.lang;
+        } else {
+            // Last resort: use Italian locale even without a specific voice
+            utterance.lang = 'it-IT';
+        }
+
+        utterance.rate = 0.7; // Slower for learning
         utterance.pitch = 1.1; // Slightly higher for child-friendly
         window.speechSynthesis.speak(utterance);
     }
+}
+
+// Initialize voices (needed for some browsers)
+export function initVoices(): Promise<SpeechSynthesisVoice[]> {
+    return new Promise((resolve) => {
+        if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+            resolve([]);
+            return;
+        }
+
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+            resolve(voices);
+            return;
+        }
+
+        // Wait for voices to load
+        window.speechSynthesis.onvoiceschanged = () => {
+            resolve(window.speechSynthesis.getVoices());
+        };
+    });
 }
