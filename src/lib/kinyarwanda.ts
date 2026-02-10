@@ -26,8 +26,8 @@ export type PatternType = 'vowel' | 'consonant' | 'cv' | 'cluster' | 'word' | 'm
 // Learning modes
 export type LearningMode = 'read' | 'guess' | 'progressive';
 
-// Game types - New engaging games for children
-export type GameType = 'soundmatch' | 'train' | 'wordbuilder' | 'stars';
+// Game types - Reading-focused games for children (no audio required)
+export type GameType = 'syllablematch' | 'missingletter' | 'wordscramble' | 'flashcard';
 
 // Game difficulty (number of options/cards)
 export type GameDifficulty = 'easy' | 'medium' | 'hard';
@@ -40,45 +40,6 @@ export interface GameState {
   totalRounds: number;
   isComplete: boolean;
   streak?: number; // For bonus encouragement
-}
-
-// Sound match option
-export interface SoundOption {
-  id: string;
-  syllable: string;
-  isCorrect: boolean;
-  isSelected: boolean;
-  color: string; // Fun colors for visual appeal
-}
-
-// Train car for syllable train game
-export interface TrainCar {
-  id: string;
-  syllable: string;
-  color: string;
-  isEngine?: boolean;
-}
-
-// Falling star for stars game
-export interface FallingStar {
-  id: string;
-  syllable: string;
-  isCorrect: boolean;
-  isCaught: boolean;
-  x: number;
-  y: number;
-  speed: number;
-  color: string;
-  rotation: number;
-}
-
-// Word piece for word builder
-export interface WordPiece {
-  id: string;
-  syllable: string;
-  position: number;
-  isPlaced: boolean;
-  color: string;
 }
 
 // Simple Kinyarwanda words for WordBuilder (syllable-separated)
@@ -202,7 +163,6 @@ export interface AppSettings {
   prioritizedClusters: string[];
   hideTarget: 'vowels' | 'consonants' | 'both';
   wordFilter: 'all' | 'no-clusters' | 'only-clusters';
-  soundEnabled: boolean;
 }
 
 // Default settings
@@ -216,5 +176,4 @@ export const DEFAULT_SETTINGS: AppSettings = {
   prioritizedClusters: [],
   hideTarget: 'both',
   wordFilter: 'all',
-  soundEnabled: true
 };

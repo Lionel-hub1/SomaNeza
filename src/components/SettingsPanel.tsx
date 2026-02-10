@@ -20,8 +20,6 @@ interface SettingsPanelProps {
     onHideTargetChange: (target: 'vowels' | 'consonants' | 'both') => void;
     wordFilter: 'all' | 'no-clusters' | 'only-clusters';
     onWordFilterChange: (filter: 'all' | 'no-clusters' | 'only-clusters') => void;
-    soundEnabled: boolean;
-    onSoundEnabledChange: (enabled: boolean) => void;
 }
 
 export default function SettingsPanel({
@@ -41,8 +39,6 @@ export default function SettingsPanel({
     onHideTargetChange,
     wordFilter,
     onWordFilterChange,
-    soundEnabled,
-    onSoundEnabledChange
 }: SettingsPanelProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'general' | 'consonants' | 'clusters'>('general');
@@ -118,19 +114,6 @@ export default function SettingsPanel({
                     <div className="min-h-[300px]">
                         {activeTab === 'general' && (
                             <div className="space-y-8 animate-in fade-in duration-500">
-                                {/* Sound Toggle */}
-                                <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">
-                                        Amajwi (Sound)
-                                        <span className="block text-[10px] text-gray-400 font-normal">Enable/disable app sounds</span>
-                                    </label>
-                                    <button
-                                        onClick={() => onSoundEnabledChange(!soundEnabled)}
-                                        className={`w-14 h-8 rounded-full transition-all relative ${soundEnabled ? 'bg-indigo-500' : 'bg-gray-200'}`}
-                                    >
-                                        <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all ${soundEnabled ? 'left-7' : 'left-1'}`} />
-                                    </button>
-                                </div>
                                 {/* Letters to Hide */}
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-end">

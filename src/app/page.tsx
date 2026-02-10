@@ -29,10 +29,10 @@ import PatternControls from '@/components/PatternControls';
 import SettingsPanel from '@/components/SettingsPanel';
 import {
   GameSelector,
-  SoundMatchGame,
-  SyllableTrainGame,
-  WordBuilderGame,
-  FallingStarsGame,
+  SyllableMatchGame,
+  MissingLetterGame,
+  WordScrambleGame,
+  FlashCardGame,
   GameComplete,
 } from '@/components/games';
 
@@ -76,7 +76,6 @@ export default function Home() {
   const [wordFilter, setWordFilter] = useState<'all' | 'no-clusters' | 'only-clusters'>(
     DEFAULT_SETTINGS.wordFilter
   );
-  const [soundEnabled, setSoundEnabled] = useState(DEFAULT_SETTINGS.soundEnabled);
 
   // Progressive mode state
   const [progressiveLevel, setProgressiveLevel] = useState<DifficultyLevel>(1);
@@ -224,18 +223,17 @@ export default function Home() {
       difficulty: gameDifficulty,
       onComplete: handleGameComplete,
       onBack: handleBackToGames,
-      soundEnabled,
     };
 
     switch (selectedGame) {
-      case 'soundmatch':
-        return <SoundMatchGame {...gameProps} />;
-      case 'train':
-        return <SyllableTrainGame {...gameProps} />;
-      case 'wordbuilder':
-        return <WordBuilderGame {...gameProps} />;
-      case 'stars':
-        return <FallingStarsGame {...gameProps} />;
+      case 'syllablematch':
+        return <SyllableMatchGame {...gameProps} />;
+      case 'missingletter':
+        return <MissingLetterGame {...gameProps} />;
+      case 'wordscramble':
+        return <WordScrambleGame {...gameProps} />;
+      case 'flashcard':
+        return <FlashCardGame {...gameProps} />;
       default:
         return null;
     }
@@ -357,8 +355,6 @@ export default function Home() {
                 onHideTargetChange={setHideTarget}
                 wordFilter={wordFilter}
                 onWordFilterChange={setWordFilter}
-                soundEnabled={soundEnabled}
-                onSoundEnabledChange={setSoundEnabled}
               />
             </section>
 

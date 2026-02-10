@@ -74,7 +74,7 @@ export function getDictionaryWord(root: string): string {
     // Let's stick to the regular consonant-ending ones for safety in the games.
     if (root.endsWith('a') || root.endsWith('i') || root.endsWith('o') || root.endsWith('u') || root.endsWith('e')) {
         return root;
-    }
+    }               
     return root + 'a';
 }
 

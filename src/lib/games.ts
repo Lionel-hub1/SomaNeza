@@ -7,10 +7,6 @@ import {
     DEFAULT_CONSONANT_CLUSTERS,
     GameState,
     GameDifficulty,
-    SoundOption,
-    TrainCar,
-    FallingStar,
-    WordPiece,
     SIMPLE_WORDS,
     GAME_COLORS,
     ENCOURAGEMENTS,
@@ -76,16 +72,6 @@ export function getRoundsPerGame(difficulty: GameDifficulty): number {
     }
 }
 
-// Get falling stars count based on difficulty
-export function getStarsCount(difficulty: GameDifficulty): number {
-    switch (difficulty) {
-        case 'easy': return 3;
-        case 'medium': return 4;
-        case 'hard': return 5;
-        default: return 3;
-    }
-}
-
 // Initialize game state
 export function initializeGameState(difficulty: GameDifficulty): GameState {
     return {
@@ -118,149 +104,6 @@ export function getRandomEncouragement(): typeof ENCOURAGEMENTS[0] {
 }
 
 // =====================
-// SOUND MATCH GAME
-// =====================
-export function generateSoundMatchOptions(
-    difficulty: GameDifficulty,
-    customClusters?: string[]
-): { target: string; options: SoundOption[] } {
-    const optionCount = getOptionCount(difficulty);
-    const syllables = generateUniqueSyllables(optionCount, customClusters);
-    const correctIndex = Math.floor(Math.random() * syllables.length);
-    const target = syllables[correctIndex];
-
-    const options: SoundOption[] = syllables.map((syllable, index) => ({
-        id: `option-${index}-${Date.now()}`,
-        syllable,
-        isCorrect: index === correctIndex,
-        isSelected: false,
-        color: GAME_COLORS[index % GAME_COLORS.length],
-    }));
-
-    return {
-        target,
-        options: options.sort(() => Math.random() - 0.5),
-    };
-}
-
-// =====================
-// SYLLABLE TRAIN GAME
-// =====================
-export function generateTrainRound(
-    difficulty: GameDifficulty,
-    existingCars: TrainCar[],
-    customClusters?: string[]
-): { target: string; options: SoundOption[] } {
-    const optionCount = getOptionCount(difficulty);
-    const syllables = generateUniqueSyllables(optionCount, customClusters);
-    const correctIndex = Math.floor(Math.random() * syllables.length);
-    const target = syllables[correctIndex];
-
-    const options: SoundOption[] = syllables.map((syllable, index) => ({
-        id: `option-${index}-${Date.now()}`,
-        syllable,
-        isCorrect: index === correctIndex,
-        isSelected: false,
-        color: GAME_COLORS[index % GAME_COLORS.length],
-    }));
-
-    return {
-        target,
-        options: options.sort(() => Math.random() - 0.5),
-    };
-}
-
-export function createTrainCar(syllable: string, carNumber: number): TrainCar {
-    return {
-        id: `car-${carNumber}-${Date.now()}`,
-        syllable,
-        color: GAME_COLORS[carNumber % GAME_COLORS.length],
-        isEngine: false,
-    };
-}
-
-export function createEngine(): TrainCar {
-    return {
-        id: `engine-${Date.now()}`,
-        syllable: '🚂',
-        color: 'from-gray-600 to-gray-800',
-        isEngine: true,
-    };
-}
-
-// =====================
-// WORD BUILDER GAME
-// =====================
-export function selectWordForDifficulty(difficulty: GameDifficulty): typeof SIMPLE_WORDS[0] {
-    let filteredWords: typeof SIMPLE_WORDS;
-
-    switch (difficulty) {
-        case 'easy':
-            filteredWords = SIMPLE_WORDS.filter(w => w.syllables.length === 2);
-            break;
-        case 'medium':
-            filteredWords = SIMPLE_WORDS.filter(w => w.syllables.length <= 3);
-            break;
-        case 'hard':
-            filteredWords = SIMPLE_WORDS;
-            break;
-        default:
-            filteredWords = SIMPLE_WORDS.filter(w => w.syllables.length === 2);
-    }
-
-    return filteredWords[Math.floor(Math.random() * filteredWords.length)];
-}
-
-export function generateWordPieces(word: typeof SIMPLE_WORDS[0]): WordPiece[] {
-    const pieces: WordPiece[] = word.syllables.map((syllable, index) => ({
-        id: `piece-${index}-${Date.now()}`,
-        syllable,
-        position: index,
-        isPlaced: false,
-        color: GAME_COLORS[index % GAME_COLORS.length],
-    }));
-
-    // Shuffle the pieces
-    return pieces.sort(() => Math.random() - 0.5);
-}
-
-export function checkWordComplete(pieces: WordPiece[], targetWord: typeof SIMPLE_WORDS[0]): boolean {
-    const placedPieces = pieces.filter(p => p.isPlaced).sort((a, b) => a.position - b.position);
-    if (placedPieces.length !== targetWord.syllables.length) return false;
-
-    return placedPieces.every((piece, index) =>
-        piece.syllable === targetWord.syllables[index]
-    );
-}
-
-// =====================
-// FALLING STARS GAME
-// =====================
-export function generateFallingStars(
-    difficulty: GameDifficulty,
-    customClusters?: string[]
-): { target: string; stars: FallingStar[] } {
-    const starCount = getStarsCount(difficulty);
-    const syllables = generateUniqueSyllables(starCount, customClusters);
-    const correctIndex = Math.floor(Math.random() * syllables.length);
-    const target = syllables[correctIndex];
-
-    const stars: FallingStar[] = syllables.map((syllable, index) => ({
-        id: `star-${index}-${Date.now()}`,
-        syllable,
-        isCorrect: index === correctIndex,
-        isCaught: false,
-        x: (100 / (starCount + 1)) * (index + 1) + (Math.random() * 10 - 5),
-        y: -20 - index * 15, // Stagger the start
-        speed: 0.2 + Math.random() * 0.15, // Varied speeds
-        color: GAME_COLORS[index % GAME_COLORS.length],
-        rotation: Math.random() * 360,
-    }));
-
-    return { target, stars };
-}
-
-// =====================
 // SCORE HANDLING
 // =====================
 export function handleCorrectAnswer(state: GameState): GameState {
@@ -290,73 +133,4 @@ export function handleWrongAnswer(state: GameState): GameState {
         isComplete,
         stars: isComplete ? calculateStars(state.score, state.totalRounds) : state.stars,
     };
-}
-
-// Speech synthesis helper (for sound-based games)
-// Kinyarwanda is not well-supported, so we use languages with similar phonetics
-export function speakSyllable(syllable: string, soundEnabled: boolean = true): void {
-    if (!soundEnabled) return;
-
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        // Cancel any ongoing speech
-        window.speechSynthesis.cancel();
-
-        const utterance = new SpeechSynthesisUtterance(syllable);
-
-        // Get available voices
-        const voices = window.speechSynthesis.getVoices();
-
-        // Preferred languages in order (Kinyarwanda vowels are similar to Italian/Spanish/Swahili)
-        // Swahili (sw) - closest Bantu language
-        // Italian (it) - pure vowels like Kinyarwanda
-        // Spanish (es) - also has pure vowels
-        // French (fr) - better than English for vowels
-        const preferredLangs = ['sw', 'it', 'es', 'fr', 'pt'];
-
-        let selectedVoice = null;
-
-        // Try to find a voice matching our preferred languages
-        for (const lang of preferredLangs) {
-            selectedVoice = voices.find(v => v.lang.startsWith(lang));
-            if (selectedVoice) break;
-        }
-
-        // If no preferred voice found, try to avoid English
-        if (!selectedVoice) {
-            selectedVoice = voices.find(v => !v.lang.startsWith('en'));
-        }
-
-        if (selectedVoice) {
-            utterance.voice = selectedVoice;
-            utterance.lang = selectedVoice.lang;
-        } else {
-            // Last resort: use Italian locale even without a specific voice
-            utterance.lang = 'it-IT';
-        }
-
-        utterance.rate = 0.7; // Slower for learning
-        utterance.pitch = 1.1; // Slightly higher for child-friendly
-        window.speechSynthesis.speak(utterance);
-    }
-}
-
-// Initialize voices (needed for some browsers)
-export function initVoices(): Promise<SpeechSynthesisVoice[]> {
-    return new Promise((resolve) => {
-        if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-            resolve([]);
-            return;
-        }
-
-        const voices = window.speechSynthesis.getVoices();
-        if (voices.length > 0) {
-            resolve(voices);
-            return;
-        }
-
-        // Wait for voices to load
-        window.speechSynthesis.onvoiceschanged = () => {
-            resolve(window.speechSynthesis.getVoices());
-        };
-    });
 }
