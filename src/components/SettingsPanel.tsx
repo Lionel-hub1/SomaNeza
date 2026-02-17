@@ -20,6 +20,8 @@ interface SettingsPanelProps {
     onHideTargetChange: (target: 'vowels' | 'consonants' | 'both') => void;
     wordFilter: 'all' | 'no-clusters' | 'only-clusters';
     onWordFilterChange: (filter: 'all' | 'no-clusters' | 'only-clusters') => void;
+    showImages: boolean;
+    onShowImagesChange: (show: boolean) => void;
 }
 
 export default function SettingsPanel({
@@ -39,6 +41,8 @@ export default function SettingsPanel({
     onHideTargetChange,
     wordFilter,
     onWordFilterChange,
+    showImages,
+    onShowImagesChange,
 }: SettingsPanelProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'general' | 'consonants' | 'clusters'>('general');
@@ -131,6 +135,30 @@ export default function SettingsPanel({
                                         onChange={(e) => onLettersToHideChange(parseInt(e.target.value))}
                                         className="w-full h-3 bg-gray-200 rounded-full appearance-none cursor-pointer accent-indigo-500"
                                     />
+                                </div>
+
+                                {/* Show Images Toggle */}
+                                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                    <div className="space-y-1">
+                                        <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">
+                                            Kwerekana amashusho
+                                        </label>
+                                        <span className="block text-[10px] text-gray-400 font-normal">Show Word Images</span>
+                                    </div>
+                                    <button
+                                        onClick={() => onShowImagesChange(!showImages)}
+                                        className={`
+                                            relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+                                            ${showImages ? 'bg-indigo-600' : 'bg-gray-200'}
+                                        `}
+                                    >
+                                        <span
+                                            className={`
+                                                inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+                                                ${showImages ? 'translate-x-6' : 'translate-x-1'}
+                                            `}
+                                        />
+                                    </button>
                                 </div>
 
                                 {/* Auto-Generation Timer */}

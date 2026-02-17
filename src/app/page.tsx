@@ -76,6 +76,7 @@ export default function Home() {
   const [wordFilter, setWordFilter] = useState<'all' | 'no-clusters' | 'only-clusters'>(
     DEFAULT_SETTINGS.wordFilter
   );
+  const [showImages, setShowImages] = useState(DEFAULT_SETTINGS.showImages);
 
   // Progressive mode state
   const [progressiveLevel, setProgressiveLevel] = useState<DifficultyLevel>(1);
@@ -328,6 +329,7 @@ export default function Home() {
                 onToggleHide={handleToggleHide}
                 isTeacherMode={isTeacherMode}
                 learningMode={learningMode}
+                showImages={showImages}
               />
             </section>
 
@@ -355,6 +357,8 @@ export default function Home() {
                 onHideTargetChange={setHideTarget}
                 wordFilter={wordFilter}
                 onWordFilterChange={setWordFilter}
+                showImages={showImages}
+                onShowImagesChange={setShowImages}
               />
             </section>
 

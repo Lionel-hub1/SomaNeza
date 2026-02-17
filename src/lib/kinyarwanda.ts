@@ -162,6 +162,7 @@ export interface AppSettings {
   prioritizedClusters: string[];
   hideTarget: 'vowels' | 'consonants' | 'both';
   wordFilter: 'all' | 'no-clusters' | 'only-clusters';
+  showImages: boolean;
 }
 
 // Default settings
@@ -175,4 +176,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   prioritizedClusters: [],
   hideTarget: 'both',
   wordFilter: 'all',
+  showImages: false,
 };

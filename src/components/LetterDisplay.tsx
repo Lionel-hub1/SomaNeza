@@ -9,6 +9,7 @@ interface LetterDisplayProps {
     onToggleHide: (index: number) => void;
     isTeacherMode: boolean;
     learningMode?: 'read' | 'guess' | 'progressive';
+    showImages?: boolean;
 }
 
 export default function LetterDisplay({
@@ -16,7 +17,8 @@ export default function LetterDisplay({
     onReveal,
     onToggleHide,
     isTeacherMode,
-    learningMode = 'read'
+    learningMode = 'read',
+    showImages = false
 }: LetterDisplayProps) {
     if (!result) {
         return (
@@ -49,7 +51,7 @@ export default function LetterDisplay({
 
     return (
         <div className="flex flex-col items-center gap-8 w-full max-w-full px-4 md:px-8">
-            {result.emoji && result.pattern === 'word' && (
+            {showImages && result.emoji && result.pattern === 'word' && (
                 <div className="text-8xl md:text-9xl animate-bounce-in mb-4">
                     {result.emoji}
                 </div>
