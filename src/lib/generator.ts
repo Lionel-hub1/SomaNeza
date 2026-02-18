@@ -138,7 +138,9 @@ export function generateCV(prioritizedConsonants: string[] = []): GeneratedResul
 export function generateClusterV(
     customClusters: string[],
     clusterConsonantCounts: number[] | 'all',
-    prioritizedClusters: string[] = []
+    prioritizedClusters: string[] = [],
+    filterContains: string[] = [],
+    filterVowel: string | 'all' = 'all'
 ): GeneratedResult {
     let availableClusters = [...customClusters];
 
@@ -149,13 +151,28 @@ export function generateClusterV(
         );
     }
 
+    // Filter by contained letters
+    if (filterContains.length > 0) {
+        availableClusters = availableClusters.filter(cluster =>
+            filterContains.some(letter => cluster.includes(letter))
+        );
+    }
+
     // If filter leaves no clusters, fallback to all available
     if (availableClusters.length === 0) {
         availableClusters = [...customClusters];
     }
 
     const cluster = pickWeighted(availableClusters, prioritizedClusters);
-    const vowel = getRandomElement(VOWELS);
+
+    // Choose vowel based on filter
+    let vowel: string;
+    if (filterVowel !== 'all' && VOWELS.includes(filterVowel as any)) {
+        vowel = filterVowel;
+    } else {
+        vowel = getRandomElement(VOWELS);
+    }
+
     const clusterLetters = splitIntoLetters(cluster);
     const letters = [...clusterLetters, vowel];
 
@@ -177,9 +194,12 @@ export function generate(
     settings: {
         customClusters: string[];
         clusterConsonantCounts: number[] | 'all';
+
         prioritizedConsonants: string[];
         prioritizedClusters: string[];
         wordFilter: 'all' | 'no-clusters' | 'only-clusters';
+        clusterFilterContains: string[];
+        clusterFilterVowel: string | 'all';
     }
 ): GeneratedResult {
     if (enabledPatterns.length === 0) {
@@ -200,7 +220,9 @@ export function generate(
             return generateClusterV(
                 settings.customClusters,
                 settings.clusterConsonantCounts,
-                settings.prioritizedClusters
+                settings.prioritizedClusters,
+                settings.clusterFilterContains,
+                settings.clusterFilterVowel
             );
         case 'word':
             return generateWord(settings.wordFilter);

@@ -21,7 +21,12 @@ interface SettingsPanelProps {
     wordFilter: 'all' | 'no-clusters' | 'only-clusters';
     onWordFilterChange: (filter: 'all' | 'no-clusters' | 'only-clusters') => void;
     showImages: boolean;
+
     onShowImagesChange: (show: boolean) => void;
+    clusterFilterContains: string[];
+    onClusterFilterContainsChange: (filters: string[]) => void;
+    clusterFilterVowel: string | 'all';
+    onClusterFilterVowelChange: (vowel: string | 'all') => void;
 }
 
 export default function SettingsPanel({
@@ -42,7 +47,12 @@ export default function SettingsPanel({
     wordFilter,
     onWordFilterChange,
     showImages,
+
     onShowImagesChange,
+    clusterFilterContains,
+    onClusterFilterContainsChange,
+    clusterFilterVowel,
+    onClusterFilterVowelChange,
 }: SettingsPanelProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'general' | 'consonants' | 'clusters'>('general');
@@ -247,15 +257,72 @@ export default function SettingsPanel({
                             </div>
                         )}
 
+
+
                         {activeTab === 'clusters' && (
-                            <div className="space-y-4 animate-in fade-in duration-500">
+                            <div className="space-y-6 animate-in fade-in duration-500">
+                                {/* Fixed Vowel Selection */}
+                                <div className="space-y-3">
+                                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">
+                                        Hitamo inyajwi
+                                        <span className="block text-[10px] text-gray-400 font-normal">Force Specific Vowel</span>
+                                    </label>
+                                    <div className="flex flex-wrap gap-2">
+                                        <button
+                                            onClick={() => onClusterFilterVowelChange('all')}
+                                            className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${clusterFilterVowel === 'all'
+                                                ? 'bg-purple-500 text-white shadow-md'
+                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                }`}
+                                        >
+                                            *
+                                        </button>
+                                        {['a', 'e', 'i', 'o', 'u'].map(v => (
+                                            <button
+                                                key={v}
+                                                onClick={() => onClusterFilterVowelChange(v)}
+                                                className={`w-10 h-10 rounded-xl text-lg font-bold transition-all ${clusterFilterVowel === v
+                                                    ? 'bg-purple-500 text-white shadow-md'
+                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                    }`}
+                                            >
+                                                {v}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Cluster Content Filter */}
+                                <div className="space-y-3">
+                                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">
+                                        Ibihekane birimo
+                                        <span className="block text-[10px] text-gray-400 font-normal">Clusters Containing...</span>
+                                    </label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['w', 'y', 'n', 'm', 's', 'sh'].map(char => (
+                                            <button
+                                                key={char}
+                                                onClick={() => togglePriority(char, clusterFilterContains, onClusterFilterContainsChange)}
+                                                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${clusterFilterContains.includes(char)
+                                                    ? 'bg-pink-500 text-white shadow-md'
+                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                    }`}
+                                            >
+                                                {char}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="h-px bg-gray-100 my-4" />
+
                                 <div className="p-3 bg-purple-50 rounded-xl border border-purple-100">
                                     <p className="text-xs text-purple-700 font-medium">
                                         Kanda ku gakwata ushaka ko gashimangirwa (Cluster + V).
                                         <span className="block opacity-75">Tap a cluster to prioritize it in Cluster mode.</span>
                                     </p>
                                 </div>
-                                <div className="flex flex-wrap gap-2 max-h-[400px] overflow-y-auto p-1 scrollbar-thin scrollbar-thumb-indigo-200">
+                                <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto p-1 scrollbar-thin scrollbar-thumb-indigo-200">
                                     {customClusters.map(c => (
                                         <button
                                             key={c}

@@ -77,6 +77,12 @@ export default function Home() {
     DEFAULT_SETTINGS.wordFilter
   );
   const [showImages, setShowImages] = useState(DEFAULT_SETTINGS.showImages);
+  const [clusterFilterContains, setClusterFilterContains] = useState<string[]>(
+    DEFAULT_SETTINGS.clusterFilterContains
+  );
+  const [clusterFilterVowel, setClusterFilterVowel] = useState<string | 'all'>(
+    DEFAULT_SETTINGS.clusterFilterVowel
+  );
 
   // Progressive mode state
   const [progressiveLevel, setProgressiveLevel] = useState<DifficultyLevel>(1);
@@ -96,7 +102,10 @@ export default function Home() {
       clusterConsonantCounts,
       prioritizedConsonants,
       prioritizedClusters,
+
       wordFilter,
+      clusterFilterContains,
+      clusterFilterVowel,
     });
 
     // Apply hiding based on mode
@@ -115,7 +124,10 @@ export default function Home() {
     prioritizedConsonants,
     prioritizedClusters,
     hideTarget,
+
     wordFilter,
+    clusterFilterContains,
+    clusterFilterVowel,
   ]);
 
   // Handle letter reveal (for guess mode)
@@ -359,6 +371,10 @@ export default function Home() {
                 onWordFilterChange={setWordFilter}
                 showImages={showImages}
                 onShowImagesChange={setShowImages}
+                clusterFilterContains={clusterFilterContains}
+                onClusterFilterContainsChange={setClusterFilterContains}
+                clusterFilterVowel={clusterFilterVowel}
+                onClusterFilterVowelChange={setClusterFilterVowel}
               />
             </section>
 
