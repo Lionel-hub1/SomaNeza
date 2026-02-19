@@ -123,6 +123,31 @@ export const SIMPLE_WORDS: { word: string; syllables: string[]; meaning: string;
   { word: 'urusenda', syllables: ['u', 'ru', 'se', 'nda'], meaning: 'Ikintu gisharira mu biryo', emoji: '🌶️' },
   { word: 'inyanya', syllables: ['i', 'nya', 'nya'], meaning: 'Ikirungo gitukura', emoji: '🍅' },
   { word: 'itunguru', syllables: ['i', 'tu', 'ngu', 'ru'], meaning: 'Ikirungo gifite impumuro', emoji: '🧅' },
+  { word: 'ihene', syllables: ['i', 'he', 'ne'], meaning: 'Itungo rigira ubwanwa', emoji: '🐐' },
+  { word: 'ingurube', syllables: ['i', 'ngu', 'ru', 'be'], meaning: 'Itungo rikunda kurya', emoji: '🐷' },
+  { word: 'imbata', syllables: ['i', 'mba', 'ta'], meaning: 'Itungo rita amagi', emoji: '🦆' },
+  { word: 'inuma', syllables: ['i', 'nu', 'ma'], meaning: 'Inyoni y\'amahoro', emoji: '🕊️' },
+  { word: 'igikeri', syllables: ['i', 'gi', 'ke', 'ri'], meaning: 'Inyamaswa isimbuka', emoji: '🐸' },
+  { word: 'inzoka', syllables: ['i', 'nzo', 'ka'], meaning: 'Inyamaswa igenda ikururuka', emoji: '🐍' },
+  { word: 'imvubu', syllables: ['i', 'mvu', 'bu'], meaning: 'Inyamaswa iba mu mazi', emoji: '🦛' },
+  { word: 'ingwe', syllables: ['i', 'ngwe'], meaning: 'Inyamaswa y\'inkazi', emoji: '🐆' },
+  { word: 'twiga', syllables: ['twi', 'ga'], meaning: 'Inyamaswa ndende cyane', emoji: '🦒' },
+  { word: 'imparage', syllables: ['i', 'mpa', 'ra', 'ge'], meaning: 'Inyamaswa ifite amabara', emoji: '🦓' },
+  { word: 'inkende', syllables: ['i', 'nke', 'nde'], meaning: 'Inyamaswa ikunda imineke', emoji: '🐒' },
+  { word: 'ipantalo', syllables: ['i', 'pa', 'nta', 'lo'], meaning: 'Umwenda wo hasi', emoji: '👖' },
+  { word: 'ishati', syllables: ['i', 'sha', 'ti'], meaning: 'Umwenda wo hejuru', emoji: '👔' },
+  { word: 'ijipo', syllables: ['i', 'ji', 'po'], meaning: 'Umwenda w\'abagore', emoji: '👗' },
+  { word: 'ikanzu', syllables: ['i', 'ka', 'nzu'], meaning: 'Umwenda muremure', emoji: '👗' },
+  { word: 'ingofero', syllables: ['i', 'ngo', 'fe', 'ro'], meaning: 'Icyo kwambara ku mutwe', emoji: '🧢' },
+  { word: 'isabune', syllables: ['i', 'sa', 'bu', 'ne'], meaning: 'Icyo dukoresha dukaraba', emoji: '🧼' },
+  { word: 'uburoso', syllables: ['u', 'bu', 'ro', 'so'], meaning: 'Icyo dukoresha twoza amenyo', emoji: '🪥' },
+  { word: 'amavuta', syllables: ['a', 'ma', 'vu', 'ta'], meaning: 'Icyo twisiga', emoji: '🧴' },
+  { word: 'ubuki', syllables: ['u', 'bu', 'ki'], meaning: 'Icyo inzuki zikora', emoji: '🍯' },
+  { word: 'ibitoki', syllables: ['i', 'bi', 'to', 'ki'], meaning: 'Ibitanga umutobe', emoji: '🍌' },
+  { word: 'amapera', syllables: ['a', 'ma', 'pe', 'ra'], meaning: 'Imbuto zifite imbere hatukura', emoji: '🍐' },
+  { word: 'amacunga', syllables: ['a', 'ma', 'cu', 'nga'], meaning: 'Imbuto zifite amazi', emoji: '🍊' },
+  { word: 'ipikipiki', syllables: ['i', 'pi', 'ki', 'pi', 'ki'], meaning: 'Ikinyabiziga cy\'amapine abiri', emoji: '🏍️' },
+  { word: 'ubwato', syllables: ['u', 'bwa', 'to'], meaning: 'Icyo kugendamo mu mazi', emoji: '🛶' },
 ];
 
 // Encouraging messages in Kinyarwanda
@@ -194,6 +219,7 @@ export interface AppSettings {
   showImages: boolean;
   clusterFilterContains: string[];
   clusterFilterVowel: string | 'all';
+  wordFilterClusters: string[];
 }
 
 // Default settings
@@ -210,4 +236,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   showImages: false,
   clusterFilterContains: [],
   clusterFilterVowel: 'all',
+  wordFilterClusters: [],
 };

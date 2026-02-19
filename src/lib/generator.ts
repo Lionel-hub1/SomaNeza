@@ -11,17 +11,38 @@ import {
 } from './kinyarwanda';
 
 // Generate a word-based result
-export function generateWord(filter: 'all' | 'no-clusters' | 'only-clusters'): GeneratedResult {
+export function generateWord(
+    filter: 'all' | 'no-clusters' | 'only-clusters',
+    requiredClusters: string[] = []
+): GeneratedResult {
     let filteredWords = [...SIMPLE_WORDS];
 
+    // First apply the basic structural filter
     if (filter === 'no-clusters') {
-        filteredWords = SIMPLE_WORDS.filter(w =>
+        filteredWords = filteredWords.filter(w =>
             !w.syllables.some(s => s.length > 2)
         );
     } else if (filter === 'only-clusters') {
-        filteredWords = SIMPLE_WORDS.filter(w =>
+        filteredWords = filteredWords.filter(w =>
             w.syllables.some(s => s.length > 2)
         );
+    }
+
+    // Then apply the specific cluster content filter if any clusters are selected
+    if (requiredClusters.length > 0) {
+        // Filter specifically for words containing ANY of the required clusters
+        const preciseMatches = filteredWords.filter(w => {
+            const wordLower = w.word.toLowerCase();
+            return requiredClusters.some(cluster => wordLower.includes(cluster));
+        });
+
+        // If we found matches, use them
+        if (preciseMatches.length > 0) {
+            filteredWords = preciseMatches;
+        }
+        // If no matches found but we requested specific clusters, we might want to return 
+        // a fallback or keep the previous filtered list. 
+        // For now, let's fall back to previous list but maybe the UI should handle "no words found"
     }
 
     // Fallback if filter is too strict
@@ -198,6 +219,7 @@ export function generate(
         prioritizedConsonants: string[];
         prioritizedClusters: string[];
         wordFilter: 'all' | 'no-clusters' | 'only-clusters';
+        wordFilterClusters?: string[];
         clusterFilterContains: string[];
         clusterFilterVowel: string | 'all';
     }
@@ -225,7 +247,7 @@ export function generate(
                 settings.clusterFilterVowel
             );
         case 'word':
-            return generateWord(settings.wordFilter);
+            return generateWord(settings.wordFilter, settings.wordFilterClusters);
         case 'mixed':
             // For mixed, randomly choose from all types
             const allPatterns: PatternType[] = ['vowel', 'consonant', 'cv', 'cluster', 'word'];
