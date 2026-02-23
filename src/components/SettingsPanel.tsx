@@ -63,9 +63,9 @@ export default function SettingsPanel({
 
     // Get available consonant counts from current clusters
     const availableCounts = useMemo(() => {
-        const counts = new Set(customClusters.map(c => c.length));
+        const counts = new Set(DEFAULT_CONSONANT_CLUSTERS.map(c => c.length));
         return Array.from(counts).sort((a, b) => a - b);
-    }, [customClusters]);
+    }, []);
 
     const handleToggleCount = (count: number) => {
         if (clusterConsonantCounts === 'all') {
@@ -84,22 +84,24 @@ export default function SettingsPanel({
     };
 
     const togglePriority = (item: string, list: string[], setter: (newList: string[]) => void) => {
-        if (list.includes(item)) {
-            setter(list.filter(i => i !== item));
-        } else {
-            setter([...list, item]);
-        }
+        const newList = list.includes(item)
+            ? list.filter(i => i !== item)
+            : [...list, item];
+        setter(newList);
     };
 
     // Prevent body scroll when mobile modal is open
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
+            document.body.style.touchAction = 'none';
         } else {
             document.body.style.overflow = 'unset';
+            document.body.style.touchAction = 'auto';
         }
         return () => {
             document.body.style.overflow = 'unset';
+            document.body.style.touchAction = 'auto';
         };
     }, [isOpen]);
 
@@ -118,7 +120,7 @@ export default function SettingsPanel({
 
             {/* Modal/Panel Overlay */}
             <div className={`
-                fixed inset-0 z-50 flex items-end md:items-center justify-center
+                fixed inset-0 z-[100] flex items-end md:items-center justify-center
                 transition-all duration-300 ease-in-out
                 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}
             `}>
@@ -130,14 +132,14 @@ export default function SettingsPanel({
 
                 {/* Panel */}
                 <div className={`
-                    relative w-full md:w-[90%] md:max-w-2xl h-[85vh] md:h-auto md:max-h-[85vh]
+                    relative w-full md:w-[90%] md:max-w-2xl h-[90vh] md:h-auto md:max-h-[85vh]
                     bg-white md:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col
-                    transition-transform duration-300 ease-in-out
+                    transition-transform duration-300 ease-in-out overflow-hidden
                     ${isOpen ? 'translate-y-0 scale-100' : 'translate-y-full md:translate-y-10 md:scale-95'}
                 `}>
 
-                    {/* Header */}
-                    <div className="flex-none p-4 border-b border-gray-100 flex items-center justify-between bg-white md:rounded-t-3xl rounded-t-3xl">
+                    {/* Header - Fixed */}
+                    <div className="flex-none p-4 border-b border-gray-100 flex items-center justify-between bg-white z-10">
                         <div className="flex items-center gap-2">
                             <span className="text-2xl">⚙️</span>
                             <div>
@@ -157,8 +159,8 @@ export default function SettingsPanel({
                         </button>
                     </div>
 
-                    {/* Tabs */}
-                    <div className="flex-none px-4 pb-2 border-b border-gray-50 overflow-x-auto scrollbar-hide">
+                    {/* Tabs - Sticky */}
+                    <div className="flex-none px-4 pb-2 border-b border-gray-50 overflow-x-auto scrollbar-hide bg-white z-10">
                         <div className="flex gap-2 min-w-max">
                             {[
                                 { id: 'general', label: 'Rusange', sub: 'General' },
@@ -186,17 +188,114 @@ export default function SettingsPanel({
                     </div>
 
                     {/* Scrollable Content */}
-                    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8 bg-gray-50/50 md:rounded-b-3xl">
+                    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8 bg-gray-50/50 overscroll-contain">
                         {activeTab === 'general' && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                                {/* Letters to Hide */}
+                                {/* Word Filter Type */}
+                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
+                                    <div>
+                                        <label className="text-sm font-bold text-gray-800">
+                                            Ubwoko bw'amagambo
+                                        </label>
+                                        <span className="block text-xs text-gray-400">Word Filter Mode</span>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[
+                                            { id: 'all', label: 'Yose', sub: 'All' },
+                                            { id: 'no-clusters', label: 'Matoya', sub: 'Simple' },
+                                            { id: 'only-clusters', label: 'Ibihekane', sub: 'Clusters' }
+                                        ].map((opt) => (
+                                            <button
+                                                key={opt.id}
+                                                onClick={() => onWordFilterChange(opt.id as any)}
+                                                className={`
+                                                    py-2 rounded-xl border transition-all flex flex-col items-center
+                                                    ${wordFilter === opt.id
+                                                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-md'
+                                                        : 'bg-gray-50 text-gray-500 border-gray-100'
+                                                    }
+                                                `}
+                                            >
+                                                <span className="text-xs font-bold">{opt.label}</span>
+                                                <span className="text-[8px] opacity-70 uppercase tracking-tighter">{opt.sub}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Cluster Consonant Count Filter */}
+                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
+                                    <div>
+                                        <label className="text-sm font-bold text-gray-800">
+                                            Uburebure bw'ibihekane
+                                        </label>
+                                        <span className="block text-xs text-gray-400">Filter by Consonant Count</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        <button
+                                            onClick={() => onClusterConsonantCountsChange('all')}
+                                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${clusterConsonantCounts === 'all'
+                                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                                : 'bg-gray-50 text-gray-500 border-gray-100'
+                                                }`}
+                                        >
+                                            YOSE (ALL)
+                                        </button>
+                                        {availableCounts.map(count => (
+                                            <button
+                                                key={count}
+                                                onClick={() => handleToggleCount(count)}
+                                                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${clusterConsonantCounts !== 'all' && clusterConsonantCounts.includes(count)
+                                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                                    : 'bg-gray-50 text-gray-500 border-gray-100'
+                                                    }`}
+                                            >
+                                                {count} {count === 1 ? 'LET' : 'LETS'}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Letters to Hide Selection (Guess Mode Target) */}
+                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
+                                    <div>
+                                        <label className="text-sm font-bold text-gray-800">
+                                            Inyuguti zihishwa (Guess Mode)
+                                        </label>
+                                        <span className="block text-xs text-gray-400">Target for Hiding</span>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[
+                                            { id: 'vowels', label: 'Inyajwi', sub: 'Vowels' },
+                                            { id: 'consonants', label: 'Ingombajwi', sub: 'Cons.' },
+                                            { id: 'both', label: 'Byose', sub: 'Both' }
+                                        ].map((opt) => (
+                                            <button
+                                                key={opt.id}
+                                                onClick={() => onHideTargetChange(opt.id as any)}
+                                                className={`
+                                                    py-2 rounded-xl border transition-all flex flex-col items-center
+                                                    ${hideTarget === opt.id
+                                                        ? 'bg-purple-600 text-white border-purple-600 shadow-md'
+                                                        : 'bg-gray-50 text-gray-500 border-gray-100'
+                                                    }
+                                                `}
+                                            >
+                                                <span className="text-xs font-bold">{opt.label}</span>
+                                                <span className="text-[8px] opacity-70 uppercase tracking-tighter">{opt.sub}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Hidden Letters Count */}
                                 <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                                     <div className="flex justify-between items-center">
                                         <div>
                                             <label className="text-sm font-bold text-gray-800">
-                                                Inyuguti zihishwa
+                                                Umubare w'inyuguti zihishwa
                                             </label>
-                                            <span className="block text-xs text-gray-400">Hidden Letters (Guess Mode)</span>
+                                            <span className="block text-xs text-gray-400">Number of Hidden Letters</span>
                                         </div>
                                         <div className="h-10 w-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-700 font-black text-xl">
                                             {lettersToHide}
